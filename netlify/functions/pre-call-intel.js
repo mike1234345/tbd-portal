@@ -367,11 +367,11 @@ async function updateGhlContact(contactId, locationId, apiKey, intelString) {
       },
       body: JSON.stringify({
         customFields: [
-          { key: 'storm_intel', field_value: intelString }
+          { id: 'LVW0IKNNbXkyYPrOUzGv', field_value: intelString }
         ]
       })
     });
-  } catch (e) { /* non-critical — Peter gets the intel in the response regardless */ }
+  } catch (e) { /* non-critical */ }
 }
 
 // ─── HANDLER ──────────────────────────────────────────────────────────────────
