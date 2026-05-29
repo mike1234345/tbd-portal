@@ -1,0 +1,661 @@
+/* =====================================================
+   TBD Dashboard Mockup v2
+   Visual-only skin designed to move the deployed UI closer to
+   the approved mission-control + field-ops preview boards.
+   ===================================================== */
+
+:root {
+  --mc-bg: #060913;
+  --mc-bg-2: #0a1020;
+  --mc-surface: rgba(10, 16, 31, 0.9);
+  --mc-surface-2: rgba(12, 19, 36, 0.92);
+  --mc-surface-3: rgba(16, 24, 44, 0.95);
+  --mc-border: rgba(132, 154, 212, 0.18);
+  --mc-border-2: rgba(132, 154, 212, 0.11);
+  --mc-text: #f5f8ff;
+  --mc-text-2: #b7c2de;
+  --mc-blue: #5d8fff;
+  --mc-blue-2: #7db0ff;
+  --mc-cyan: #54d7ff;
+  --mc-amber: #ffb04d;
+  --mc-orange: #ff944d;
+  --mc-violet: #8d77ff;
+  --mc-success: #23d78a;
+  --mc-shadow: 0 26px 70px rgba(1, 6, 19, 0.52);
+  --mc-shadow-soft: 0 12px 34px rgba(2, 8, 24, 0.32);
+  --mc-radius: 18px;
+  --mc-radius-lg: 26px;
+}
+
+body,
+body.portal-app {
+  background:
+    radial-gradient(1400px 700px at 84% -12%, rgba(76,126,255,0.18), transparent 62%),
+    radial-gradient(1200px 620px at -6% 104%, rgba(86,215,255,0.12), transparent 56%),
+    linear-gradient(180deg, #050812 0%, #09101d 42%, #070b16 100%);
+  color: var(--mc-text);
+}
+
+body::after {
+  opacity: 0.14 !important;
+}
+
+/* ===== Login ===== */
+.login-card {
+  background:
+    linear-gradient(135deg, rgba(9,13,24,0.97), rgba(10,16,28,0.92)),
+    linear-gradient(180deg, rgba(255,255,255,0.02), transparent 36%) !important;
+  border: 1px solid rgba(126,151,214,0.18) !important;
+  box-shadow: 0 34px 90px rgba(0,0,0,0.58) !important;
+}
+
+.login-logo .logo-sub,
+.sidebar-logo .logo-sub {
+  color: #d7e3ff !important;
+  letter-spacing: 0.18em;
+}
+
+.login-scene-panel {
+  background:
+    linear-gradient(180deg, rgba(4,8,18,0.1), rgba(4,8,18,0.8)),
+    radial-gradient(500px 260px at 10% 18%, rgba(88,141,255,0.24), transparent 62%),
+    url('/dashboard/mockup-assets/login-hero.jpg') center/cover no-repeat !important;
+  border: 1px solid rgba(126,151,214,0.16) !important;
+}
+
+.login-scene-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6,9,20,0.12), rgba(6,9,20,0.7));
+  pointer-events: none;
+}
+
+.login-feature-pills span {
+  background: rgba(12,19,35,0.82) !important;
+  border-color: rgba(114,160,255,0.18) !important;
+}
+
+.btn-login {
+  background: linear-gradient(135deg, #5d8fff, #8470ff) !important;
+  box-shadow: 0 14px 32px rgba(80,122,255,0.42) !important;
+}
+
+/* ===== Sidebar ===== */
+.sidebar,
+body.portal-app .sidebar {
+  width: 250px !important;
+  background:
+    linear-gradient(180deg, rgba(7,11,21,0.97), rgba(8,13,24,0.93)),
+    linear-gradient(180deg, rgba(255,255,255,0.018), transparent 28%) !important;
+  border-right: 1px solid rgba(110,132,188,0.16) !important;
+  box-shadow: 20px 0 54px rgba(1, 6, 18, 0.34) !important;
+}
+
+.sidebar-logo,
+body.portal-app .sidebar-logo {
+  padding: 22px 20px 18px !important;
+}
+
+.sidebar-nav,
+body.portal-app .sidebar-nav {
+  padding: 16px 12px 18px !important;
+  gap: 7px !important;
+}
+
+.nav-item,
+body.portal-app .nav-item {
+  padding: 12px 13px !important;
+  border-radius: 12px !important;
+  border: 1px solid transparent !important;
+  background: rgba(255,255,255,0.015) !important;
+  font-weight: 600 !important;
+  color: #aebadb !important;
+}
+
+.nav-item i,
+body.portal-app .nav-item i {
+  color: #c7d4f6;
+}
+
+.nav-item:hover,
+body.portal-app .nav-item:hover {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: rgba(120,145,206,0.1) !important;
+  color: #eef4ff !important;
+}
+
+.nav-item.active,
+body.portal-app .nav-item.active {
+  background:
+    linear-gradient(135deg, rgba(82,128,255,0.24), rgba(104,86,255,0.16)),
+    rgba(255,255,255,0.03) !important;
+  color: #f3f7ff !important;
+  border-color: rgba(100,141,255,0.3) !important;
+  box-shadow: 0 12px 26px rgba(24, 46, 98, 0.28) !important;
+}
+
+.nav-item.active::before,
+body.portal-app .nav-item.active::before {
+  left: -11px !important;
+  width: 4px !important;
+  height: 24px !important;
+}
+
+.user-info {
+  background: rgba(255,255,255,0.03) !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+/* ===== Main shell ===== */
+.main-content,
+body.portal-app .main-content {
+  padding: 26px 28px 38px !important;
+}
+
+.view {
+  gap: 0;
+}
+
+.view-header,
+body.portal-app .view-header {
+  min-height: 202px !important;
+  padding: 28px 28px 24px !important;
+  border-radius: var(--mc-radius-lg) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--mc-border) !important;
+  box-shadow: var(--mc-shadow) !important;
+  background:
+    linear-gradient(180deg, rgba(7,10,19,0.28), rgba(7,10,19,0.64)),
+    linear-gradient(135deg, rgba(9,14,25,0.98), rgba(11,17,32,0.88)) !important;
+}
+
+.view-header::before,
+body.portal-app .view-header::before {
+  top: 20px !important;
+  left: 22px !important;
+  min-height: 30px !important;
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  font-size: 0.68rem !important;
+  letter-spacing: 0.14em !important;
+  background: rgba(10,20,38,0.7) !important;
+  border: 1px solid rgba(108,150,255,0.18) !important;
+  color: #dcedff !important;
+}
+
+.view-header > *,
+body.portal-app .view-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+.view-header h1,
+body.portal-app .view-header h1 {
+  margin-top: 26px !important;
+  font-size: clamp(2rem, 2.3vw, 2.7rem) !important;
+  line-height: 0.96 !important;
+  letter-spacing: -0.05em !important;
+  max-width: 12ch;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.32);
+}
+
+.view-header p,
+body.portal-app .view-header p {
+  margin-top: 10px !important;
+  max-width: 470px !important;
+  font-size: 0.92rem !important;
+  color: rgba(231,239,255,0.82) !important;
+}
+
+.view-header::after,
+body.portal-app .view-header::after {
+  inset: 0 !important;
+  opacity: 1 !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+#view-overview .view-header,
+#view-leads .view-header {
+  min-height: 202px !important;
+  padding: 0 !important;
+  background: #070c14 !important;
+}
+
+#view-overview .view-header::before,
+#view-leads .view-header::before {
+  content: none !important;
+  display: none !important;
+}
+
+#view-overview .view-header h1,
+#view-overview .view-header p,
+#view-overview #overviewIntro,
+#view-leads .view-header h1,
+#view-leads .view-header p {
+  display: none !important;
+}
+
+#view-overview .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/overview-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-leads .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/leads-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+
+#view-map .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.72) 0%, rgba(7,10,18,0.35) 20%, rgba(7,10,18,0.18) 100%),
+    url('/dashboard/mockup-assets/storm-hero.jpg') center/cover no-repeat !important;
+}
+
+#view-calls .view-header::after,
+#view-dialer .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.82) 0%, rgba(7,10,18,0.55) 38%, rgba(7,10,18,0.18) 100%),
+    url('/dashboard/mockup-assets/calls-hero.jpg') center/cover no-repeat !important;
+}
+
+#view-training .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.86) 0%, rgba(7,10,18,0.62) 38%, rgba(7,10,18,0.2) 100%),
+    url('/dashboard/mockup-assets/training-hero.jpg') center/cover no-repeat !important;
+}
+
+#view-signed-clients .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.88) 0%, rgba(7,10,18,0.58) 40%, rgba(7,10,18,0.22) 100%),
+    url('/dashboard/mockup-assets/signed-hero.jpg') center/cover no-repeat !important;
+}
+
+#view-appointments .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.88) 0%, rgba(7,10,18,0.60) 36%, rgba(7,10,18,0.18) 100%),
+    url('/dashboard/mockup-assets/appointments-wide.jpg') center/cover no-repeat !important;
+}
+
+#view-messages .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.86) 0%, rgba(7,10,18,0.66) 44%, rgba(7,10,18,0.24) 100%),
+    linear-gradient(135deg, rgba(87,134,255,0.18), rgba(0,0,0,0) 45%),
+    radial-gradient(circle at 78% 36%, rgba(84,215,255,0.14), transparent 0 22%),
+    linear-gradient(180deg, #0a1120, #0d1528) !important;
+}
+
+#view-settings .view-header::after,
+#view-partner-contracts .view-header::after,
+#view-agent-admin .view-header::after,
+#view-contracts-setup .view-header::after {
+  background:
+    linear-gradient(90deg, rgba(7,10,18,0.86) 0%, rgba(7,10,18,0.62) 44%, rgba(7,10,18,0.2) 100%),
+    linear-gradient(135deg, rgba(87,134,255,0.16), rgba(0,0,0,0) 46%),
+    linear-gradient(180deg, #0a1120, #0d1528) !important;
+}
+
+/* ===== Cards ===== */
+.stat-card,
+.funnel-card,
+.recent-leads-card,
+.settings-card,
+.admin-overview-panel,
+.admin-agent-card,
+.mapmode-main-card,
+.mapmode-card,
+.training-hub-card,
+.training-viewer-card-modern,
+.storm-map-board,
+.storm-map-card,
+.leads-table-wrap,
+body.portal-app .stat-card,
+body.portal-app .funnel-card,
+body.portal-app .recent-leads-card,
+body.portal-app .settings-card,
+body.portal-app .admin-overview-panel,
+body.portal-app .admin-agent-card,
+body.portal-app .mapmode-main-card,
+body.portal-app .mapmode-card,
+body.portal-app .training-hub-card,
+body.portal-app .training-viewer-card-modern,
+body.portal-app .storm-map-board,
+body.portal-app .storm-map-card,
+body.portal-app .leads-table-wrap {
+  background:
+    linear-gradient(180deg, rgba(10,16,31,0.96), rgba(10,17,32,0.9)),
+    linear-gradient(180deg, rgba(255,255,255,0.02), transparent 42%) !important;
+  border: 1px solid rgba(126,151,214,0.14) !important;
+  box-shadow: var(--mc-shadow-soft) !important;
+  border-radius: 18px !important;
+}
+
+.stat-card,
+body.portal-app .stat-card {
+  min-height: 128px !important;
+  padding: 18px !important;
+}
+
+.stat-card .stat-label,
+.admin-stat-label,
+.rate-label,
+.funnel-sub,
+body.portal-app .stat-card .stat-label {
+  color: #93a3cc !important;
+}
+
+.stat-card .stat-value,
+.admin-stat-value,
+.rate-val,
+body.portal-app .stat-card .stat-value {
+  color: #f8fbff !important;
+}
+
+.stat-icon {
+  border-radius: 14px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.funnel-card h2,
+.recent-leads-card h2,
+.admin-overview-head h2,
+.admin-agent-head h3,
+.settings-card h2,
+.mapmode-card h3,
+.mapmode-main-card h3,
+.training-hub-card h3,
+.training-viewer-card-modern h3,
+.storm-map-card h3 {
+  color: #f3f7ff !important;
+}
+
+.leads-table thead th,
+.admin-agent-table thead th {
+  background: rgba(255,255,255,0.03) !important;
+  border-bottom-color: rgba(126,151,214,0.12) !important;
+  color: #c5d3f4 !important;
+}
+
+.leads-table tbody td,
+.admin-agent-table tbody td {
+  border-bottom-color: rgba(126,151,214,0.08) !important;
+}
+
+/* ===== Buttons & chips ===== */
+.btn-add,
+.btn-login,
+.btn-save,
+.btn-primary,
+.btn-save-modern,
+button.btn-primary,
+button.primary,
+body.portal-app .btn-add,
+body.portal-app .btn-save {
+  background: linear-gradient(135deg, #5d8fff, #8373ff) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 28px rgba(68,108,238,0.3) !important;
+  border: none !important;
+}
+
+.btn-secondary,
+.btn-import,
+button.btn-secondary,
+body.portal-app .btn-secondary {
+  background: rgba(255,255,255,0.04) !important;
+  color: #dde7ff !important;
+  border: 1px solid rgba(126,151,214,0.14) !important;
+}
+
+.status-badge,
+.priority-badge,
+.training-drill-badge,
+.lead-total-chip {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ===== View-specific polish ===== */
+#view-overview .stats-grid,
+#view-leads .header-flex,
+#view-map .storm-map-shell,
+#view-training .training-mode-grid,
+#view-appointments .appointments-grid {
+  position: relative;
+}
+
+#view-overview .funnel-card,
+#view-overview .recent-leads-card {
+  border-color: rgba(126,151,214,0.14) !important;
+}
+
+#view-map .storm-map-board,
+#view-map .storm-map-card,
+#view-map .mapmode-main-card,
+#view-map .mapmode-card {
+  border-color: rgba(84,215,255,0.18) !important;
+}
+
+.storm-coverage-map {
+  border-radius: 18px !important;
+  border-color: rgba(84,215,255,0.16) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+#view-training .training-drill-card {
+  background:
+    linear-gradient(135deg, rgba(76,126,255,0.18), rgba(141,119,255,0.14)),
+    rgba(13,20,36,0.92) !important;
+  border: 1px solid rgba(126,151,214,0.14) !important;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1100px) {
+  .view-header,
+  body.portal-app .view-header {
+    min-height: 180px !important;
+  }
+  .view-header h1,
+  body.portal-app .view-header h1 {
+    max-width: none;
+    font-size: 1.9rem !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .main-content,
+  body.portal-app .main-content {
+    padding: 18px 14px 30px !important;
+  }
+  .view-header,
+  body.portal-app .view-header {
+    min-height: 152px !important;
+    padding: 18px 16px 18px !important;
+    border-radius: 18px !important;
+  }
+  .view-header::before,
+  body.portal-app .view-header::before {
+    top: 14px !important;
+    left: 14px !important;
+  }
+  .view-header h1,
+  body.portal-app .view-header h1 {
+    margin-top: 22px !important;
+    font-size: 1.55rem !important;
+  }
+  .sidebar,
+  body.portal-app .sidebar {
+    width: 100% !important;
+  }
+}
+
+/* ===== Image-only banner set overrides ===== */
+#view-overview .view-header,
+#view-leads .view-header,
+#view-map .view-header,
+#view-messages .view-header,
+#view-calls .view-header,
+#view-dialer .view-header,
+#view-appointments .view-header,
+#view-training .view-header,
+#view-settings .view-header,
+#view-signed-clients .view-header,
+body.portal-app #view-overview .view-header,
+body.portal-app #view-leads .view-header,
+body.portal-app #view-map .view-header,
+body.portal-app #view-messages .view-header,
+body.portal-app #view-calls .view-header,
+body.portal-app #view-dialer .view-header,
+body.portal-app #view-appointments .view-header,
+body.portal-app #view-training .view-header,
+body.portal-app #view-settings .view-header,
+body.portal-app #view-signed-clients .view-header {
+  min-height: 202px !important;
+  padding: 0 !important;
+  background: #070c14 !important;
+  overflow: hidden !important;
+}
+
+#view-overview .view-header::before,
+#view-leads .view-header::before,
+#view-map .view-header::before,
+#view-messages .view-header::before,
+#view-calls .view-header::before,
+#view-dialer .view-header::before,
+#view-appointments .view-header::before,
+#view-training .view-header::before,
+#view-settings .view-header::before,
+#view-signed-clients .view-header::before,
+body.portal-app #view-overview .view-header::before,
+body.portal-app #view-leads .view-header::before,
+body.portal-app #view-map .view-header::before,
+body.portal-app #view-messages .view-header::before,
+body.portal-app #view-calls .view-header::before,
+body.portal-app #view-dialer .view-header::before,
+body.portal-app #view-appointments .view-header::before,
+body.portal-app #view-training .view-header::before,
+body.portal-app #view-settings .view-header::before,
+body.portal-app #view-signed-clients .view-header::before {
+  content: none !important;
+  display: none !important;
+}
+
+#view-overview .view-header h1,
+#view-overview .view-header p,
+#view-overview #overviewIntro,
+#view-leads .view-header h1,
+#view-leads .view-header p,
+#view-map .view-header h1,
+#view-map .view-header p,
+#view-messages .view-header h1,
+#view-messages .view-header p,
+#view-calls .view-header h1,
+#view-calls .view-header p,
+#view-dialer .view-header h1,
+#view-dialer .view-header p,
+#view-appointments .view-header h1,
+#view-appointments .view-header p,
+#view-training .view-header h1,
+#view-training .view-header p,
+#view-settings .view-header h1,
+#view-settings .view-header p,
+#view-signed-clients .view-header h1,
+#view-signed-clients .view-header p,
+body.portal-app #view-overview .view-header h1,
+body.portal-app #view-overview .view-header p,
+body.portal-app #view-overview #overviewIntro,
+body.portal-app #view-leads .view-header h1,
+body.portal-app #view-leads .view-header p,
+body.portal-app #view-map .view-header h1,
+body.portal-app #view-map .view-header p,
+body.portal-app #view-messages .view-header h1,
+body.portal-app #view-messages .view-header p,
+body.portal-app #view-calls .view-header h1,
+body.portal-app #view-calls .view-header p,
+body.portal-app #view-dialer .view-header h1,
+body.portal-app #view-dialer .view-header p,
+body.portal-app #view-appointments .view-header h1,
+body.portal-app #view-appointments .view-header p,
+body.portal-app #view-training .view-header h1,
+body.portal-app #view-training .view-header p,
+body.portal-app #view-settings .view-header h1,
+body.portal-app #view-settings .view-header p,
+body.portal-app #view-signed-clients .view-header h1,
+body.portal-app #view-signed-clients .view-header p {
+  display: none !important;
+}
+
+#view-overview .view-header::after,
+body.portal-app #view-overview .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/overview-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-leads .view-header::after,
+body.portal-app #view-leads .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/leads-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-map .view-header::after,
+body.portal-app #view-map .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/storm-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-messages .view-header::after,
+body.portal-app #view-messages .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/messages-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-calls .view-header::after,
+body.portal-app #view-calls .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/calls-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-dialer .view-header::after,
+body.portal-app #view-dialer .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/dialer-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-appointments .view-header::after,
+body.portal-app #view-appointments .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/appointments-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-training .view-header::after,
+body.portal-app #view-training .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/training-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-settings .view-header::after,
+body.portal-app #view-settings .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/settings-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+#view-signed-clients .view-header::after,
+body.portal-app #view-signed-clients .view-header::after {
+  background: #070c14 url('/dashboard/mockup-assets/signed-hero-banner-fit.png') center center/cover no-repeat !important;
+}
+
+@media (max-width: 760px) {
+  #view-overview .view-header,
+  #view-leads .view-header,
+  #view-map .view-header,
+  #view-messages .view-header,
+  #view-calls .view-header,
+  #view-dialer .view-header,
+  #view-appointments .view-header,
+  #view-training .view-header,
+  #view-settings .view-header,
+  #view-signed-clients .view-header,
+  body.portal-app #view-overview .view-header,
+  body.portal-app #view-leads .view-header,
+  body.portal-app #view-map .view-header,
+  body.portal-app #view-messages .view-header,
+  body.portal-app #view-calls .view-header,
+  body.portal-app #view-dialer .view-header,
+  body.portal-app #view-appointments .view-header,
+  body.portal-app #view-training .view-header,
+  body.portal-app #view-settings .view-header,
+  body.portal-app #view-signed-clients .view-header {
+    min-height: 152px !important;
+    padding: 0 !important;
+  }
+}
