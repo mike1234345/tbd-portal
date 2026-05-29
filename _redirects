@@ -1,0 +1,10 @@
+/dashboard / 301
+/dashboard/ / 301
+/portal /portal/index.html 200
+/portal/ /portal/index.html 200
+/dashboard/training/roofing_callsheet /dashboard/training/roofing_callsheet.html 200
+/dashboard/training/plumbing_callsheet /dashboard/training/plumbing_callsheet.html 200
+/portal/training/roofing_callsheet /dashboard/training/roofing_callsheet.html 200
+/portal/training/plumbing_callsheet /dashboard/training/plumbing_callsheet.html 200
+/portal/training/roofing_callsheet.html /dashboard/training/roofing_callsheet.html 200
+/portal/training/plumbing_callsheet.html /dashboard/training/plumbing_callsheet.html 200
