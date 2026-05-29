@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure Contract Signing</title>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(12, 24, 44, 0.92);
+      --border: rgba(255,255,255,0.12);
+      --text: #eef4ff;
+      --muted: #9fb1d1;
+      --primary: #4f8cff;
+      --success: #2ec27e;
+      --danger: #ff6b6b;
+      --warning: #ffb347;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, rgba(79,140,255,0.18), transparent 28%), linear-gradient(180deg, #07111f 0%, #0a1628 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .shell { max-width: 1180px; margin: 0 auto; display: grid; gap: 16px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 22px 48px rgba(0,0,0,0.24);
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    .muted { color: var(--muted); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+    }
+    .pill.success { color: #ccffe7; background: rgba(46,194,126,0.16); }
+    .pill.warning { color: #ffe2b0; background: rgba(255,179,71,0.16); }
+    .pill.danger { color: #ffd2d2; background: rgba(255,107,107,0.16); }
+    .status { margin-bottom: 12px; min-height: 20px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr); gap: 16px; align-items: start; }
+    .pdf-shell { background: rgba(0,0,0,0.35); border-radius: 14px; padding: 8px; overflow: auto; max-height: 78vh; }
+    .pdf-shell canvas { display: block; margin: 0 auto 10px; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); background: white; }
+    .pdf-fallback { padding: 20px; text-align: center; color: var(--muted); }
+    .pdf-fallback a { color: var(--primary); }
+    .sign-card { display: grid; gap: 12px; }
+    .signature-pad-wrap { position: relative; background: white; border-radius: 12px; border: 2px dashed rgba(79,140,255,0.5); padding: 4px; }
+    .signature-pad-wrap canvas { display: block; width: 100%; height: 180px; background: white; border-radius: 8px; touch-action: none; }
+    .signature-pad-hint { position: absolute; inset: 50% 0 auto 0; text-align: center; color: #b8c6df; pointer-events: none; transform: translateY(-50%); font-weight: 600; }
+    .signature-pad-actions { display: flex; gap: 8px; }
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+    button.primary { background: var(--primary); }
+    button.success { background: var(--success); color: #062315; }
+    button.danger { background: var(--danger); }
+    button:disabled { opacity: 0.58; cursor: not-allowed; }
+    label.field { display: grid; gap: 4px; font-weight: 600; }
+    label.field input, label.field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font: inherit;
+    }
+    .meta-row { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .meta-row:last-child { border-bottom: none; }
+    .meta-row span { color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-size: .74rem; font-weight: 700; }
+    @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } .pdf-shell { max-height: none; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div id="status" class="status muted">Loading secure signing session…</div>
+      <h1>Secure Contract Signing</h1>
+      <div id="signingModeBanner" class="pill warning" style="display:none;">In-person mode \u2014 signing on this device</div>
+    </div>
+
+    <div class="layout">
+      <div class="card">
+        <h2 id="contractTitle">Contract</h2>
+        <div id="pdfShell" class="pdf-shell">
+          <div class="pdf-fallback"><p>Loading contract document\u2026</p></div>
+        </div>
+      </div>
+
+      <div class="card sign-card">
+        <h2>Sign &amp; Submit</h2>
+        <div id="requestMeta" class="meta-row-group"></div>
+        <div id="fieldsForm"></div>
+        <!-- v3.5.2: Signature pad is hidden if the template has no signature fields for this signer -->
+        <div id="signaturePadSection">
+          <label class="field">Your Signature
+            <div class="signature-pad-wrap">
+              <canvas id="signaturePad"></canvas>
+              <div id="signatureHint" class="signature-pad-hint">Draw your signature here</div>
+            </div>
+          </label>
+          <div class="signature-pad-actions" style="margin-top:8px;">
+            <button type="button" id="clearSignatureBtn">Clear Signature</button>
+          </div>
+        </div>
+        <!-- NEW v3.5.1: Separate Initials Pad shown only when the template has initials fields for this signer -->
+        <div id="initialsPadSection" style="display:none;margin-top:12px;">
+          <label class="field">Your Initials
+            <div class="signature-pad-wrap initials-pad-wrap" style="max-width:220px;">
+              <canvas id="initialsPad" style="height:120px;"></canvas>
+              <div id="initialsHint" class="signature-pad-hint">Draw your initials</div>
+            </div>
+          </label>
+          <div class="signature-pad-actions" style="margin-top:8px;">
+            <button type="button" id="clearInitialsBtn">Clear Initials</button>
+            <button type="button" id="copyFromSignatureBtn" title="Use the same drawing you made above">Copy from signature</button>
+          </div>
+        </div>
+        <label class="field" style="display:flex; align-items:center; gap:10px; font-weight:500;">
+          <input id="consentCheck" type="checkbox" />
+          <span class="muted">I am the named signer and I consent to sign this contract electronically.</span>
+        </label>
+        <label class="field">Decision Note (optional)
+          <textarea id="decisionNote" placeholder="Optional note added to your decision"></textarea>
+        </label>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button id="signBtn" class="success" type="button">Sign Contract</button>
+          <button id="declineBtn" class="danger" type="button">Decline</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const token = new URLSearchParams(window.location.search).get('token') || '';
+    const inPersonMode = ['in_person', '1', 'true'].includes(new URLSearchParams(window.location.search).get('mode') || '');
+    let bundle = null;
+    let signaturePad = null;
+    let initialsPad = null;
+
+    if (window['pdfjsLib']) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+
+    function setStatus(message, tone = '') {
+      const el = $('status');
+      el.className = 'status' + (tone ? ' pill ' + tone : ' muted');
+      el.textContent = message;
+    }
+
+    function pretty(value) {
+      return String(value || '\u2014').replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
+    }
+
+    async function api(method, payload) {
+      const url = method === 'GET'
+        ? `/.netlify/functions/partner-contracts-public?token=${encodeURIComponent(token)}`
+        : '/.netlify/functions/partner-contracts-public';
+      const res = await fetch(url, {
+        method,
+        headers: method === 'GET' ? undefined : { 'Content-Type': 'application/json' },
+        body: method === 'GET' ? undefined : JSON.stringify({ token, ...payload })
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Request failed.');
+      return json;
+    }
+
+    function renderMeta() {
+      const r = bundle.request || {};
+      const s = bundle.signer || {};
+      const p = bundle.partner || {};
+      const meta = [
+        { label: 'Partner', value: p.display_name || p.business_name || '\u2014' },
+        { label: 'Request', value: r.request_title || '\u2014' },
+        { label: 'Signer', value: s.signer_name || '\u2014' },
+        { label: 'Email', value: s.signer_email || '\u2014' },
+        { label: 'Status', value: pretty(s.status || 'draft') }
+      ];
+      $('requestMeta').innerHTML = meta.map((row) => `<div class="meta-row"><span>${row.label}</span><strong>${row.value}</strong></div>`).join('');
+      $('contractTitle').textContent = r.request_title || 'Contract';
+      $('signingModeBanner').style.display = inPersonMode ? 'inline-flex' : 'none';
+    }
+
+    function renderFieldsForm() {
+      const wrap = $('fieldsForm');
+      const fields = bundle.fields || [];
+      const editable = fields.filter((f) => ['text', 'date'].includes(String(f.type || 'text')) && f.signer_role !== 'partner');
+      if (!editable.length) { wrap.innerHTML = ''; return; }
+      wrap.innerHTML = `
+        <h3 style="margin:6px 0 8px;">Confirm Your Info</h3>
+        <p class="muted" style="margin-bottom:8px;font-size:.88rem;">Review and update any fields below before signing.</p>
+        ${editable.map((field) => `
+          <label class="field" style="margin-bottom:8px;">${field.label || field.id}
+            <input data-field-id="${field.id}" type="${field.type === 'date' ? 'date' : 'text'}" value="${field.resolved_value || ''}" />
+          </label>
+        `).join('')}
+      `;
+    }
+
+    async function renderPdf() {
+      const url = bundle.template_version?.pdf_url;
+      const shell = $('pdfShell');
+      if (!url) {
+        shell.innerHTML = '<div class="pdf-fallback"><p>This contract does not have a viewable PDF attached yet. Your signature will still be applied to the digital record.</p></div>';
+        return;
+      }
+      if (!window.pdfjsLib) {
+        shell.innerHTML = `<div class="pdf-fallback"><p><a href="${url}" target="_blank" rel="noopener noreferrer">Open contract PDF in a new tab</a></p></div>`;
+        return;
+      }
+      try {
+        const loadingTask = window.pdfjsLib.getDocument(url);
+        const pdfDoc = await loadingTask.promise;
+        shell.innerHTML = '';
+        const scale = Math.min(1.5, (shell.clientWidth - 24) / 612);
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          const page = await pdfDoc.getPage(pageNum);
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          shell.appendChild(canvas);
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        }
+      } catch (err) {
+        shell.innerHTML = `<div class="pdf-fallback"><p>Could not render PDF inline. <a href="${url}" target="_blank" rel="noopener noreferrer">Open in a new tab</a>.</p></div>`;
+      }
+    }
+
+    function initSignaturePad() {
+      if (!window.SignaturePad) return;
+      const canvas = $('signaturePad');
+      // Make canvas internal resolution match its CSS size for crisp lines
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      function resize() {
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        if (signaturePad) signaturePad.clear();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      signaturePad = new window.SignaturePad(canvas, { backgroundColor: 'rgba(255,255,255,0)' });
+      signaturePad.addEventListener('beginStroke', () => {
+        $('signatureHint').style.display = 'none';
+      });
+      $('clearSignatureBtn').addEventListener('click', () => {
+        signaturePad.clear();
+        $('signatureHint').style.display = '';
+      });
+    }
+
+    // v3.5.1: Initialise the initials pad (only when template has initials fields for this signer)
+    function initInitialsPad() {
+      const canvas = $('initialsPad');
+      if (!canvas || initialsPad) return;
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      function resize() {
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        if (initialsPad) initialsPad.clear();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      initialsPad = new window.SignaturePad(canvas, { backgroundColor: 'rgba(255,255,255,0)' });
+      initialsPad.addEventListener('beginStroke', () => {
+        $('initialsHint').style.display = 'none';
+      });
+      $('clearInitialsBtn').addEventListener('click', () => {
+        initialsPad.clear();
+        $('initialsHint').style.display = '';
+      });
+      $('copyFromSignatureBtn').addEventListener('click', () => {
+        if (!signaturePad || signaturePad.isEmpty()) {
+          setStatus('Draw your signature above first, then click "Copy from signature".', 'warning');
+          return;
+        }
+        // Re-use the signature data on the initials canvas
+        const data = signaturePad.toData();
+        initialsPad.fromData(data);
+        $('initialsHint').style.display = 'none';
+      });
+    }
+
+    // v3.5.2: Detect which pads this signer needs based on the field map.
+    // - Signature pad appears only if there's at least one 'signature' field for this role.
+    // - Initials pad appears only if there's at least one 'initials' field for this role.
+    // Also disables the "Copy from signature" button when the signature pad is hidden.
+    function signerHasFieldsOfType(type) {
+      const fields = bundle?.fields || [];
+      const role = bundle?.signer?.signer_role || 'client';
+      return fields.some((f) => String(f.type) === type && (f.signer_role || 'client') === role);
+    }
+
+    function maybeShowSignaturePad() {
+      const section = $('signaturePadSection');
+      if (!section) return;
+      if (signerHasFieldsOfType('signature')) {
+        section.style.display = '';
+        if (!signaturePad) initSignaturePad();
+      } else {
+        section.style.display = 'none';
+      }
+    }
+
+    function maybeShowInitialsPad() {
+      const section = $('initialsPadSection');
+      if (!section) return;
+      const hasInitials = signerHasFieldsOfType('initials');
+      if (hasInitials) {
+        section.style.display = '';
+        if (!initialsPad) initInitialsPad();
+        // If there's no signature pad shown, hide the "Copy from signature" button
+        const copyBtn = $('copyFromSignatureBtn');
+        if (copyBtn) copyBtn.style.display = signerHasFieldsOfType('signature') ? '' : 'none';
+      } else {
+        section.style.display = 'none';
+      }
+    }
+
+    function collectFieldValues() {
+      const out = {};
+      document.querySelectorAll('[data-field-id]').forEach((input) => {
+        out[input.dataset.fieldId] = input.value || '';
+      });
+      return out;
+    }
+
+    function getSignatureDataUrl() {
+      if (!signaturePad || signaturePad.isEmpty()) return '';
+      return signaturePad.toDataURL('image/png');
+    }
+
+    // v3.5.1: Return drawn initials PNG (or empty string if none drawn)
+    function getInitialsDataUrl() {
+      if (!initialsPad || initialsPad.isEmpty()) return '';
+      return initialsPad.toDataURL('image/png');
+    }
+
+    async function refresh() {
+      if (!token) { setStatus('Missing signing token.', 'danger'); return; }
+      try {
+        setStatus('Loading request details\u2026');
+        bundle = await api('GET');
+        renderMeta();
+        renderFieldsForm();
+        await renderPdf();
+        // v3.5.2: Only show the pads that this signer actually needs
+        maybeShowSignaturePad();
+        maybeShowInitialsPad();
+        // Edge case: signer has neither signature nor initials fields
+        // (e.g., template only has text fields for them). Show a small note.
+        if (!signerHasFieldsOfType('signature') && !signerHasFieldsOfType('initials')) {
+          const note = document.createElement('p');
+          note.className = 'muted';
+          note.style.cssText = 'margin:8px 0;font-size:0.88rem;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;';
+          note.innerHTML = '<i class="fas fa-circle-info"></i> This contract has no signature or initials fields assigned to you. Just confirm consent and click Sign Contract to record your agreement.';
+          const card = document.querySelector('.sign-card');
+          const consentLabel = $('consentCheck')?.closest('label');
+          if (card && consentLabel && !card.querySelector('.no-fields-note')) {
+            note.classList.add('no-fields-note');
+            card.insertBefore(note, consentLabel);
+          }
+        }
+        const closed = ['signed', 'declined', 'voided', 'expired'].includes(String(bundle.request?.status || ''));
+        const actionable = ['sent', 'viewed'].includes(String(bundle.signer?.status || ''));
+        $('signBtn').disabled = closed || !actionable;
+        $('declineBtn').disabled = closed || !actionable;
+        setStatus('Secure signing session loaded.', 'success');
+        // Mark viewed automatically if currently sent
+        if (bundle.signer?.status === 'sent') {
+          try { await api('POST', { action: 'view' }); } catch { /* ignore */ }
+        }
+      } catch (error) {
+        setStatus(error.message, 'danger');
+      }
+    }
+
+    async function takeSign() {
+      if (!$('consentCheck').checked) {
+        setStatus('Please confirm consent before signing.', 'warning');
+        return;
+      }
+      // v3.5.2: Each pad is required ONLY when its corresponding field type exists for this signer.
+      const needsSignature = signerHasFieldsOfType('signature');
+      const needsInitials = signerHasFieldsOfType('initials');
+      const signatureImage = getSignatureDataUrl();
+      const initialsImage = getInitialsDataUrl();
+
+      if (needsSignature && !signatureImage) {
+        setStatus('Please draw your signature in the box before submitting.', 'warning');
+        return;
+      }
+      if (needsInitials && !initialsImage) {
+        setStatus('This contract has fields for your initials. Please draw your initials' + (needsSignature ? ' (or click "Copy from signature")' : '') + ' before submitting.', 'warning');
+        return;
+      }
+      try {
+        setStatus('Submitting signature\u2026', 'warning');
+        bundle = await api('POST', {
+          action: 'sign',
+          decision_note: $('decisionNote').value || '',
+          field_values: collectFieldValues(),
+          signature_image_data: signatureImage || '',
+          initials_image_data: initialsImage || '',
+          signature_payload: {
+            method: 'drawn',
+            captured_at: new Date().toISOString(),
+            user_agent: navigator.userAgent,
+            in_person: inPersonMode,
+            has_signature_image: Boolean(signatureImage),
+            has_initials_image: Boolean(initialsImage)
+          }
+        });
+        renderMeta();
+        $('signBtn').disabled = true;
+        $('declineBtn').disabled = true;
+        setStatus('Contract signed successfully. Thank you. Refreshing the contract view…', 'success');
+        setTimeout(() => refresh(), 2500);
+      } catch (error) {
+        setStatus(error.message, 'danger');
+      }
+    }
+
+    async function takeDecline() {
+      const note = $('decisionNote').value || '';
+      if (!confirm('Are you sure you want to decline this contract?')) return;
+      try {
+        setStatus('Submitting decline\u2026', 'warning');
+        bundle = await api('POST', { action: 'decline', decision_note: note });
+        renderMeta();
+        $('signBtn').disabled = true;
+        $('declineBtn').disabled = true;
+        setStatus('You have declined this contract.', 'danger');
+      } catch (error) {
+        setStatus(error.message, 'danger');
+      }
+    }
+
+    $('signBtn').addEventListener('click', takeSign);
+    $('declineBtn').addEventListener('click', takeDecline);
+    refresh();
+  </script>
+</body>
+</html>
