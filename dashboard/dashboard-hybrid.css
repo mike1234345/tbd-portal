@@ -1,0 +1,686 @@
+/* =====================================================
+   TBD Dashboard Hybrid Immersive Theme Pack
+   v1.0 — generated redesign overlay for dashboard + portal
+   ===================================================== */
+
+:root {
+  --hybrid-orange: #ff8b57;
+  --hybrid-cyan: #46d7ff;
+  --hybrid-violet: #8f6dff;
+  --hybrid-green: #29d8a2;
+  --hybrid-surface: linear-gradient(180deg, rgba(14,18,33,0.88), rgba(16,22,39,0.72));
+  --hybrid-border: rgba(255,255,255,0.12);
+  --hybrid-shadow: 0 22px 60px rgba(0,0,0,0.35);
+  --view-glow-a: rgba(79,140,255,0.18);
+  --view-glow-b: rgba(168,85,247,0.14);
+}
+
+body {
+  position: relative;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+body::before {
+  background:
+    radial-gradient(900px 460px at 92% 8%, var(--view-glow-a), transparent 68%),
+    radial-gradient(760px 480px at 6% 88%, var(--view-glow-b), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.018), transparent 28%);
+  opacity: 1;
+}
+
+body::after {
+  background:
+    linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 34px 34px, 34px 34px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.48), transparent 78%);
+  opacity: 0.26;
+}
+
+body[data-active-view="overview"] {
+  --view-glow-a: rgba(255,139,87,0.20);
+  --view-glow-b: rgba(123,92,255,0.16);
+}
+body[data-active-view="leads"] {
+  --view-glow-a: rgba(41,216,162,0.18);
+  --view-glow-b: rgba(79,140,255,0.15);
+}
+body[data-active-view="map"] {
+  --view-glow-a: rgba(70,215,255,0.18);
+  --view-glow-b: rgba(123,92,255,0.18);
+}
+body[data-active-view="calls"],
+body[data-active-view="dialer"] {
+  --view-glow-a: rgba(255,139,87,0.18);
+  --view-glow-b: rgba(70,215,255,0.14);
+}
+body[data-active-view="appointments"] {
+  --view-glow-a: rgba(249,115,22,0.18);
+  --view-glow-b: rgba(34,211,165,0.14);
+}
+body[data-active-view="training"] {
+  --view-glow-a: rgba(168,85,247,0.18);
+  --view-glow-b: rgba(79,140,255,0.16);
+}
+body[data-active-view="signed-clients"] {
+  --view-glow-a: rgba(255,190,92,0.16);
+  --view-glow-b: rgba(79,140,255,0.16);
+}
+
+.login-screen,
+.dashboard-screen,
+.main-content,
+.sidebar {
+  position: relative;
+  z-index: 1;
+}
+
+/* ================= LOGIN ================= */
+.login-screen {
+  padding: 32px;
+}
+
+.login-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(800px 420px at 10% 20%, rgba(79,140,255,0.18), transparent 66%),
+    radial-gradient(700px 400px at 92% 82%, rgba(255,139,87,0.12), transparent 66%),
+    linear-gradient(135deg, rgba(255,255,255,0.025), transparent 36%);
+  pointer-events: none;
+}
+
+.login-card {
+  max-width: 1080px;
+  width: min(1080px, 94vw);
+  min-height: 620px;
+  padding: 46px 48px;
+  padding-right: min(48px, 4vw);
+  border-radius: 30px;
+  background:
+    linear-gradient(135deg, rgba(13,18,34,0.92), rgba(12,16,28,0.78)),
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 38%);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 40px 90px rgba(0,0,0,0.5);
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 32px;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.login-card::before {
+  background: linear-gradient(135deg, rgba(79,140,255,0.08), transparent 50%);
+}
+
+.login-logo,
+.login-card h1,
+.login-subtitle,
+.login-feature-pills,
+.login-form,
+.login-footer {
+  position: relative;
+  z-index: 2;
+}
+
+.login-logo,
+.login-card h1,
+.login-subtitle,
+.login-feature-pills,
+.login-form,
+.login-footer {
+  max-width: 100%;
+}
+
+.login-logo {
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+
+.login-card h1 {
+  font-size: clamp(2rem, 2.6vw, 2.6rem);
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  font-size: 0.98rem;
+  max-width: 560px;
+  margin-bottom: 18px;
+}
+
+.login-feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.login-feature-pills span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e9eefc;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.login-feature-pills i {
+  color: var(--hybrid-cyan);
+}
+
+.login-form {
+  max-width: 480px;
+}
+
+.login-scene-panel {
+  position: relative;
+  min-height: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  background:
+    linear-gradient(180deg, rgba(7,12,25,0.15), rgba(7,12,25,0.65)),
+    radial-gradient(520px 240px at 18% 22%, rgba(79,140,255,0.32), transparent 62%),
+    radial-gradient(420px 240px at 80% 78%, rgba(255,139,87,0.24), transparent 64%),
+    radial-gradient(340px 200px at 62% 40%, rgba(143,109,255,0.2), transparent 70%),
+    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(145deg, #09111f, #141b30 55%, #0d1527);
+  background-size: auto, auto, auto, auto, 34px 34px, 34px 34px, auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.login-scene-panel::before {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+
+.login-scene-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(9, 217, 255, 0.12);
+  border: 1px solid rgba(70,215,255,0.22);
+  color: #d6fbff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-scene-panel h2,
+.login-scene-panel p,
+.login-scene-stats,
+.login-scene-stats span {
+  position: relative;
+  z-index: 1;
+}
+
+.login-scene-panel h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 2.4vw, 2.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  max-width: 9ch;
+  margin-bottom: 14px;
+}
+
+.login-scene-panel p {
+  color: rgba(232,235,245,0.78);
+  max-width: 32ch;
+  font-size: 0.95rem;
+}
+
+.login-scene-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.login-scene-stats span {
+  padding: 12px 10px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.78rem;
+  color: #d8dff1;
+}
+
+.login-scene-stats strong {
+  display: block;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 264px;
+  background:
+    linear-gradient(180deg, rgba(8,11,21,0.92), rgba(12,16,29,0.82)),
+    linear-gradient(180deg, rgba(255,255,255,0.02), transparent 38%);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 18px 0 40px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 220px;
+  background:
+    radial-gradient(320px 160px at 16% 8%, rgba(79,140,255,0.22), transparent 70%),
+    radial-gradient(300px 160px at 82% 0%, rgba(143,109,255,0.18), transparent 72%);
+  pointer-events: none;
+}
+
+.sidebar-logo,
+.sidebar-nav,
+.sidebar-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-logo {
+  padding: 24px 22px 20px;
+}
+
+.sidebar-nav {
+  gap: 8px;
+  padding: 18px 14px;
+}
+
+.nav-item {
+  border: 1px solid transparent;
+  background: rgba(255,255,255,0.02);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.nav-item:hover {
+  transform: translateX(4px);
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.06);
+}
+
+.nav-item.active {
+  background:
+    linear-gradient(135deg, rgba(79,140,255,0.2), rgba(143,109,255,0.12)),
+    rgba(255,255,255,0.04);
+  border-color: rgba(79,140,255,0.25);
+  box-shadow: 0 14px 30px rgba(28, 76, 158, 0.26);
+}
+
+.user-info {
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.btn-logout {
+  border-radius: 12px;
+}
+
+/* ================= CONTENT ================= */
+.main-content {
+  padding: 30px 34px 44px;
+}
+
+.view {
+  position: relative;
+}
+
+.view-header {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 26px;
+  padding: 28px 30px 28px;
+  min-height: 172px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background:
+    linear-gradient(135deg, rgba(11,15,27,0.94), rgba(18,24,43,0.82)),
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 40%);
+  box-shadow: var(--hybrid-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  isolation: isolate;
+}
+
+.view-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+.view-header::before {
+  content: 'OPERATIONS VIEW';
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #dff8ff;
+  background: rgba(70,215,255,0.12);
+  border: 1px solid rgba(70,215,255,0.22);
+  z-index: 2;
+}
+
+.view-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(8,11,20,0.08), rgba(8,11,20,0.62)),
+    radial-gradient(540px 240px at 90% 10%, rgba(79,140,255,0.22), transparent 58%),
+    radial-gradient(480px 220px at 72% 82%, rgba(255,139,87,0.16), transparent 60%),
+    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: auto, auto, auto, 28px 28px, 28px 28px;
+  opacity: 0.98;
+}
+
+.view-header h1 {
+  font-size: clamp(1.95rem, 2.8vw, 2.7rem);
+  margin-bottom: 8px;
+}
+
+.view-header p {
+  max-width: 760px;
+  font-size: 0.97rem;
+  color: rgba(232,235,245,0.78);
+}
+
+#view-overview .view-header::before { content: 'FIELD PERFORMANCE'; }
+#view-overview .view-header::after {
+  background:
+    linear-gradient(180deg, rgba(8,11,20,0.08), rgba(8,11,20,0.62)),
+    radial-gradient(620px 240px at 88% 12%, rgba(255,139,87,0.22), transparent 58%),
+    radial-gradient(480px 220px at 75% 84%, rgba(143,109,255,0.16), transparent 62%),
+    linear-gradient(120deg, transparent 0 34%, rgba(255,255,255,0.07) 34% 35%, transparent 35% 100%),
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, 30px 30px, 30px 30px;
+}
+
+#view-leads .view-header::before { content: 'PIPELINE + TERRITORY'; }
+#view-leads .view-header::after {
+  background:
+    linear-gradient(180deg, rgba(6,12,18,0.06), rgba(6,12,18,0.58)),
+    radial-gradient(560px 230px at 92% 18%, rgba(41,216,162,0.20), transparent 58%),
+    radial-gradient(500px 210px at 66% 84%, rgba(79,140,255,0.16), transparent 62%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 20px),
+    linear-gradient(90deg, transparent 0 72%, rgba(255,255,255,0.04) 72% 73%, transparent 73% 100%);
+}
+
+#view-map .view-header::before { content: 'MISSION CONTROL'; }
+#view-map .view-header::after {
+  background:
+    linear-gradient(180deg, rgba(5,12,20,0.08), rgba(5,12,20,0.58)),
+    radial-gradient(circle at 82% 48%, rgba(70,215,255,0.22) 0 3%, transparent 3.2% 100%),
+    radial-gradient(circle at 82% 48%, rgba(70,215,255,0.14) 0 16%, transparent 16.4% 100%),
+    radial-gradient(circle at 82% 48%, rgba(143,109,255,0.12) 0 28%, transparent 28.4% 100%),
+    linear-gradient(135deg, rgba(79,140,255,0.14), transparent 45%),
+    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, auto, 24px 24px, 24px 24px;
+}
+
+#view-messages .view-header::before { content: 'CONVERSATION FLOW'; }
+#view-calls .view-header::before,
+#view-dialer .view-header::before { content: 'CALL COMMAND'; }
+#view-calls .view-header::after,
+#view-dialer .view-header::after {
+  background:
+    linear-gradient(180deg, rgba(8,11,20,0.08), rgba(8,11,20,0.62)),
+    radial-gradient(560px 230px at 88% 20%, rgba(255,139,87,0.18), transparent 58%),
+    radial-gradient(420px 200px at 72% 80%, rgba(70,215,255,0.14), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 22px),
+    linear-gradient(0deg, transparent 0 58%, rgba(255,255,255,0.04) 58% 60%, transparent 60% 100%);
+}
+
+#view-appointments .view-header::before { content: 'BOOKED INSPECTIONS'; }
+#view-training .view-header::before { content: 'AGENT READINESS'; }
+#view-settings .view-header::before { content: 'WORKSPACE CONTROL'; }
+#view-signed-clients .view-header::before { content: 'SIGNED CLIENTS'; }
+#view-partner-contracts .view-header::before { content: 'DOCUMIKE WORKFLOW'; }
+#view-agent-admin .view-header::before { content: 'TEAM OVERSIGHT'; }
+
+.header-flex {
+  width: 100%;
+}
+
+.stats-grid,
+.admin-stats-grid {
+  gap: 16px;
+}
+
+.stat-card,
+.funnel-card,
+.recent-leads-card,
+.admin-overview-panel,
+.admin-agent-card,
+.leads-table-wrap,
+.settings-card,
+.mapmode-main-card,
+.mapmode-card,
+.training-hub-card,
+.training-viewer-card-modern,
+.storm-map-board,
+.storm-map-card {
+  background: var(--hybrid-surface) !important;
+  border: 1px solid var(--hybrid-border) !important;
+  box-shadow: var(--hybrid-shadow);
+  border-radius: 22px !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.stat-card {
+  min-height: 116px;
+  border-radius: 20px !important;
+}
+
+.stat-card::before {
+  opacity: 0.55;
+}
+
+.leads-table-wrap,
+.recent-list,
+.settings-card,
+.admin-overview-panel,
+.admin-agent-card,
+.storm-map-board,
+.storm-map-card {
+  overflow: hidden;
+}
+
+.leads-table thead th,
+.admin-agent-table thead th {
+  background: rgba(255,255,255,0.05);
+}
+
+.btn-add,
+.btn-save,
+.btn-primary-action,
+button.primary {
+  box-shadow: 0 12px 28px rgba(79,140,255,0.28);
+}
+
+#view-leads .header-actions,
+#view-overview .view-header,
+#view-map .view-header,
+#view-appointments .view-header,
+#view-training .view-header {
+  position: relative;
+}
+
+#view-map .storm-map-board,
+#view-map .storm-map-card,
+#view-map .mapmode-main-card,
+#view-map .mapmode-card {
+  border-color: rgba(70,215,255,0.16) !important;
+}
+
+#view-training .training-drill-card {
+  background: linear-gradient(135deg, rgba(143,109,255,0.20), rgba(79,140,255,0.16));
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 18px 36px rgba(64,54,130,0.28);
+}
+
+#view-calls .view-header,
+#view-dialer .view-header {
+  min-height: 164px;
+}
+
+#view-overview .recent-leads-card,
+#view-overview .funnel-card {
+  position: relative;
+}
+
+#view-overview .recent-leads-card::before,
+#view-overview .funnel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(70,215,255,0), rgba(70,215,255,0.62), rgba(70,215,255,0));
+  opacity: 0.7;
+}
+
+body.portal-app .sidebar,
+body.portal-app .main-content,
+body.portal-app .view-header,
+body.portal-app .stat-card,
+body.portal-app .funnel-card,
+body.portal-app .recent-leads-card,
+body.portal-app .login-card {
+  box-shadow: var(--hybrid-shadow);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1180px) {
+  .login-card {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .login-scene-panel {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 980px) {
+  .sidebar {
+    width: 100%;
+  }
+
+  .main-content {
+    padding: 22px 18px 36px;
+  }
+
+  .view-header {
+    min-height: 152px;
+    padding: 24px 20px 22px;
+    border-radius: 22px;
+  }
+
+  .view-header::before {
+    top: 16px;
+    left: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .login-screen {
+    padding: 18px;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+    border-radius: 24px;
+    gap: 22px;
+  }
+
+  .login-feature-pills {
+    gap: 8px;
+  }
+
+  .login-feature-pills span {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .login-scene-panel h2 {
+    max-width: none;
+    font-size: 1.7rem;
+  }
+
+  .login-scene-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .view-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .view-header p {
+    font-size: 0.9rem;
+  }
+
+  .stat-card,
+  .funnel-card,
+  .recent-leads-card,
+  .admin-overview-panel,
+  .admin-agent-card,
+  .leads-table-wrap,
+  .settings-card,
+  .mapmode-main-card,
+  .mapmode-card,
+  .training-hub-card,
+  .training-viewer-card-modern,
+  .storm-map-board,
+  .storm-map-card {
+    border-radius: 18px !important;
+  }
+}
