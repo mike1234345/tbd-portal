@@ -1,0 +1,10 @@
+{
+  "name": "tbd-marketing-solutions-site",
+  "version": "3.2.1",
+  "private": true,
+  "description": "TBD Marketing Solutions site + Netlify functions (Partner Contracts, Quo, Storm Intel, Telnyx, Push)",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "pdf-lib": "^1.17.1"
+  }
+}
