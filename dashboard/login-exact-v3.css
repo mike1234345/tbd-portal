@@ -1,0 +1,324 @@
+/* =====================================================
+   TBD Login Exact v3
+   Rebuild of dashboard + portal login screens to closely match
+   the approved reference layout.
+   ===================================================== */
+
+#loginScreen.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: #0b0b0c;
+}
+
+#loginScreen .login-card.login-card-exact {
+  width: min(1100px, 100%);
+  min-height: 600px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.52fr) minmax(350px, 0.92fr);
+  gap: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(70, 91, 134, 0.42);
+  background: linear-gradient(180deg, rgba(6,10,18,0.98), rgba(7,10,16,0.96));
+  box-shadow: 0 30px 80px rgba(0,0,0,0.58);
+  overflow: hidden;
+}
+
+.login-visual-reference {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 570px;
+  background: #070c14;
+  border: 1px solid rgba(92, 112, 160, 0.18);
+}
+
+.login-visual-reference::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7,11,20,0.02), rgba(7,11,20,0.08));
+  pointer-events: none;
+}
+
+.login-visual-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
+  background: #070c14;
+}
+
+.login-auth-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.login-auth-card {
+  width: 100%;
+  max-width: 356px;
+  border-radius: 12px;
+  border: 1px solid rgba(92, 112, 160, 0.24);
+  background: linear-gradient(180deg, rgba(11,16,28,0.98), rgba(10,15,24,0.96));
+  box-shadow: 0 16px 44px rgba(0,0,0,0.34);
+  padding: 28px 22px 20px;
+}
+
+.login-auth-card h1 {
+  margin: 0 0 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f6f8fd;
+  font-family: var(--font, 'Inter', sans-serif);
+}
+
+.login-auth-card .login-subtitle {
+  margin: 0 0 24px;
+  color: #9ea8c2;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 28ch;
+}
+
+.login-auth-card .login-form {
+  max-width: none;
+}
+
+.login-auth-card .form-group {
+  margin-bottom: 16px;
+}
+
+.login-auth-card .label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.login-auth-card label {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #d5dced;
+}
+
+.login-auth-card label i {
+  display: none;
+}
+
+.login-link-btn {
+  background: none;
+  border: none;
+  color: #6d88ff;
+  padding: 0;
+  font-size: 0.73rem;
+  cursor: pointer;
+}
+
+.login-link-btn:hover {
+  color: #89a1ff;
+}
+
+.login-auth-card input {
+  background: #121827 !important;
+  border: 1px solid rgba(97, 117, 165, 0.16) !important;
+  border-radius: 7px !important;
+  padding: 12px 14px !important;
+  color: #f1f5ff !important;
+  font-size: 0.88rem !important;
+  box-shadow: none !important;
+}
+
+.login-auth-card input::placeholder {
+  color: #5c657f;
+}
+
+.login-auth-card input:focus {
+  border-color: rgba(86, 116, 255, 0.46) !important;
+  background: #131b2d !important;
+  box-shadow: 0 0 0 3px rgba(78, 111, 255, 0.12) !important;
+}
+
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap input {
+  padding-right: 42px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #8790ab;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.password-toggle-btn:hover {
+  color: #b8c3e8;
+}
+
+.login-auth-card .btn-login.login-primary-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 11px 16px;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  background: linear-gradient(180deg, #2f68ff, #2457e5) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 10px 24px rgba(28,88,255,0.24) !important;
+}
+
+.login-auth-card .btn-login.login-primary-btn i {
+  display: none;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 14px;
+  color: #68728e;
+  font-size: 0.74rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(97, 117, 165, 0.16);
+}
+
+.social-login-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 7px;
+  border: 1px solid rgba(97, 117, 165, 0.18);
+  background: #0f1522;
+  color: #dbe5fb;
+  font-size: 0.84rem;
+  margin-bottom: 10px;
+  cursor: default;
+}
+
+.social-login-btn i.fa-google {
+  color: #ffffff;
+}
+
+.social-login-btn i.fa-microsoft {
+  color: #ffffff;
+}
+
+.login-help-text {
+  margin-top: 16px;
+  font-size: 0.74rem;
+  color: #8f9ab6;
+  text-align: left;
+}
+
+.login-help-text a {
+  color: #dbe5fb;
+  text-decoration: none;
+}
+
+.login-help-text a:hover {
+  text-decoration: underline;
+}
+
+.login-back-link {
+  margin-top: 12px;
+  font-size: 0.72rem;
+  color: #6f7a97;
+}
+
+.login-back-link a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.login-back-link a:hover {
+  color: #a9b6da;
+}
+
+/* turn off older custom login treatments */
+.login-card-exact .login-logo,
+.login-card-exact > .login-scene-panel,
+.login-card-exact > .login-feature-pills,
+.login-card-exact > .login-footer {
+  display: none !important;
+}
+
+@media (max-width: 1080px) {
+  #loginScreen .login-card.login-card-exact {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .login-visual-reference {
+    min-height: 360px;
+  }
+
+  .login-visual-img {
+    object-fit: contain;
+  }
+
+  .login-auth-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  #loginScreen.login-screen {
+    padding: 14px;
+  }
+
+  #loginScreen .login-card.login-card-exact {
+    padding: 12px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+
+  .login-visual-reference {
+    min-height: 260px;
+  }
+
+  .login-visual-img {
+    object-fit: contain;
+  }
+
+  .login-auth-card {
+    padding: 22px 16px 18px;
+  }
+
+  .login-auth-card h1 {
+    font-size: 1.65rem;
+  }
+}
