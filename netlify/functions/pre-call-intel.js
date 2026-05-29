@@ -1,4 +1,3 @@
-/* build:1780028952622 */
 /**
  * pre-call-intel.js — Netlify Function
  * 
@@ -383,7 +382,7 @@ exports.handler = async (event) => {
     return { statusCode: 204, headers: JSON_HEADERS, body: '' };
   }
 
-  let address, contactId, name, locationId;
+  let address, contactId, name, locationId, ghlApiKey;
 
   if (event.httpMethod === 'POST') {
     try {
@@ -392,6 +391,7 @@ exports.handler = async (event) => {
       contactId  = body.contactId;
       name       = body.name;
       locationId = body.locationId;
+      ghlApiKey  = body.ghlApiKey;
     } catch { return res(400, { ok: false, error: 'Invalid JSON body' }); }
   } else {
     const q   = event.queryStringParameters || {};
@@ -399,6 +399,7 @@ exports.handler = async (event) => {
     contactId  = q.contactId;
     name       = q.name;
     locationId = q.locationId;
+    ghlApiKey  = q.ghlApiKey;
   }
 
   if (!address) return res(400, { ok: false, error: 'address is required' });
@@ -432,7 +433,7 @@ exports.handler = async (event) => {
     const shortIntel = buildShortIntel(stormResult, propertyResult);
 
     // Step 4: Write back to GHL contact field (non-blocking)
-    const apiKey = process.env.GHL_API_KEY;
+    const apiKey = ghlApiKey || process.env.GHL_API_KEY;
     updateGhlContact(contactId, locationId, apiKey, intel);
 
     return res(200, {
