@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline | TBD Agent Portal</title>
+  <meta name="theme-color" content="#4f8cff" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #06070d;
+      color: #e8ebf5;
+      font-family: Inter, system-ui, sans-serif;
+      padding: 24px;
+    }
+    .card {
+      max-width: 460px;
+      width: 100%;
+      background: rgba(22,26,46,.82);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.45);
+    }
+    h1 { margin: 0 0 10px; font-size: 1.6rem; }
+    p { margin: 0 0 12px; color: #a8aec5; line-height: 1.6; }
+    a {
+      display: inline-block;
+      margin-top: 8px;
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(135deg, #4f8cff, #7b5cff);
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>You’re offline</h1>
+    <p>The portal shell is installed, but live CRM data still needs a connection.</p>
+    <p>Reconnect to the internet, then reopen the dashboard to sync leads, calls, appointments, and messages.</p>
+    <a href="/dashboard/">Try again</a>
+  </div>
+</body>
+</html>
