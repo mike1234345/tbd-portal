@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Dashboard | TBD Marketing Solutions</title>
+  <meta name="description" content="Installable CRM dashboard for TBD Marketing Solutions agents and admins." />
+  <meta name="theme-color" content="#4f8cff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TBD Agent Portal" />
+  <link rel="manifest" href="manifest.json?v=3" />
+  <link rel="apple-touch-icon" href="/dashboard/icons/icon-192.png?v=2" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="dashboard-hybrid.css" />
+  <link rel="stylesheet" href="dialer.css" />
+</head>
+<body>
+
+  <!-- ====== LOGIN SCREEN ====== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-tbd">TBD</span>
+        <span class="logo-sub">Agent Portal</span>
+      </div>
+      <h1>Welcome Back</h1>
+      <p class="login-subtitle">Sign in to manage your leads, storm intel, appointments, and daily call flow from one immersive workspace.</p>
+      <div class="login-feature-pills">
+        <span><i class="fas fa-cloud-bolt"></i> Storm Intel</span>
+        <span><i class="fas fa-users"></i> Lead Pipeline</span>
+        <span><i class="fas fa-calendar-check"></i> Appointments</span>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="loginEmail"><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="loginEmail" placeholder="agent@tbdmarketing.com" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
+        </div>
+        <div id="loginError" class="login-error hidden"></div>
+        <button type="submit" class="btn-login">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <a href="../">← Back to main site</a>
+      </div>
+      <div class="login-scene-panel" aria-hidden="true">
+        <div class="login-scene-badge"><i class="fas fa-satellite-dish"></i> Hybrid Mission View</div>
+        <h2>Storm Intel. Leads. Appointments.</h2>
+        <p>A more immersive workspace inspired by field ops, mission control, and premium editorial dashboards.</p>
+        <div class="login-scene-stats">
+          <span><strong>Overview</strong> KPI-first command center</span>
+          <span><strong>Leads</strong> Cleaner pipeline flow</span>
+          <span><strong>Calls</strong> Faster next actions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== DASHBOARD ====== -->
+  <div id="dashboardScreen" class="dashboard-screen hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-tbd">TBD</span>
+        <span class="logo-sub">Agent Portal</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="overview">
+          <i class="fas fa-chart-line"></i> Overview
+        </a>
+        <a href="#" class="nav-item" data-view="leads">
+          <i class="fas fa-users"></i> Leads
+        </a>
+        <a href="#" class="nav-item" data-view="map">
+          <i class="fas fa-cloud-bolt"></i> Storm Intel
+        </a>
+        <a href="#" class="nav-item" data-view="messages">
+          <i class="fas fa-comments"></i> Messages
+          <span id="messagesUnreadBadge" class="nav-badge hidden">0</span>
+        </a>
+        <a href="#" class="nav-item" data-view="calls">
+          <i class="fas fa-phone"></i> Call Log
+        </a>
+        <a href="#" class="nav-item" data-view="dialer" id="dialerNavItem">
+          <i class="fas fa-headset"></i> Call Command
+        </a>
+        <a href="#" class="nav-item" data-view="appointments">
+          <i class="fas fa-calendar-check"></i> Appointments
+        </a>
+        <!-- Contracts Setup nav item removed in v3.4.0 — access via the ⚙️ Settings button inside DocuMike. -->
+        <a href="#" class="nav-item hidden" data-view="contracts-setup" id="contractsSetupNavItem" style="display:none !important;">
+          <i class="fas fa-rocket"></i> DocuMike Settings
+        </a>
+        <a href="#" class="nav-item hidden" data-view="partner-contracts" id="partnerContractsNavItem">
+          <i class="fas fa-file-contract"></i> DocuMike
+        </a>
+        <a href="#" class="nav-item hidden" data-view="signed-clients" id="signedClientsNavItem">
+          <i class="fas fa-file-signature"></i> Signed Clients
+        </a>
+        <a href="#" class="nav-item hidden" data-view="agent-admin" id="adminNavItem">
+          <i class="fas fa-user-shield"></i> Manage Agents
+        </a>
+        <a href="#" class="nav-item" data-view="training">
+          <i class="fas fa-graduation-cap"></i> Training
+        </a>
+        <a href="#" class="nav-item" data-view="settings">
+          <i class="fas fa-cog"></i> Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar"><i class="fas fa-user"></i></div>
+          <div>
+            <div class="user-name-row"><div class="user-name" id="userName">Agent</div><span id="userRoleBadge" class="role-badge">Agent</span></div>
+            <div class="user-email" id="userEmail">—</div>
+          </div>
+        </div>
+        <button id="logoutBtn" class="btn-logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ============== OVERVIEW VIEW ============== -->
+      <section class="view active" id="view-overview">
+        <header class="view-header">
+          <h1>Overview</h1>
+          <p id="overviewIntro">Your performance at a glance — calls, presentations, and appointments.</p>
+        </header>
+
+        <!-- Top stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(26,110,245,0.15); color: #1a6ef5;">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <div>
+              <div class="stat-label">Calls Made (Today)</div>
+              <div class="stat-value" id="statCallsToday">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(16,185,129,0.15); color: #10b981;">
+              <i class="fas fa-check"></i>
+            </div>
+            <div>
+              <div class="stat-label">Answered</div>
+              <div class="stat-value" id="statAnswered">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(124,58,237,0.15); color: #7c3aed;">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <div>
+              <div class="stat-label">Presentations</div>
+              <div class="stat-value" id="statPresentations">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(249,115,22,0.15); color: #f97316;">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+              <div class="stat-label">Appointments Booked</div>
+              <div class="stat-value" id="statBooked">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversion funnel -->
+        <div class="funnel-card">
+          <h2><i class="fas fa-filter"></i> Conversion Funnel (All Time)</h2>
+          <p class="funnel-sub">From dial to appointment — see where leads drop off.</p>
+          <div class="funnel">
+            <div class="funnel-stage" id="funnelCalls">
+              <div class="funnel-bar" style="--w: 100%; background: linear-gradient(90deg,#1a6ef5,#3d87ff);">
+                <span class="funnel-label">Total Calls</span>
+                <span class="funnel-num">0</span>
+              </div>
+            </div>
+            <div class="funnel-stage" id="funnelAnswered">
+              <div class="funnel-bar" style="--w: 0%; background: linear-gradient(90deg,#10b981,#34d399);">
+                <span class="funnel-label">Answered</span>
+                <span class="funnel-num">0</span>
+              </div>
+            </div>
+            <div class="funnel-stage" id="funnelPres">
+              <div class="funnel-bar" style="--w: 0%; background: linear-gradient(90deg,#7c3aed,#a78bfa);">
+                <span class="funnel-label">Allowed Presentation</span>
+                <span class="funnel-num">0</span>
+              </div>
+            </div>
+            <div class="funnel-stage" id="funnelBooked">
+              <div class="funnel-bar" style="--w: 0%; background: linear-gradient(90deg,#f97316,#fb923c);">
+                <span class="funnel-label">Appointments Booked</span>
+                <span class="funnel-num">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="rate-grid">
+            <div><span class="rate-label">Answer Rate</span><span class="rate-val" id="rateAnswer">—</span></div>
+            <div><span class="rate-label">Pitch Rate</span><span class="rate-val" id="ratePitch">—</span></div>
+            <div><span class="rate-label">Book Rate</span><span class="rate-val" id="rateBook">—</span></div>
+          </div>
+          <div id="teamSplitSummary" class="funnel-sub" style="margin-top:10px;">Team split will appear here once agents are labeled.</div>
+        </div>
+
+        <div id="adminOverviewPanel" class="admin-overview-panel hidden">
+          <div class="admin-overview-head">
+            <div>
+              <h2><i class="fas fa-user-shield"></i> Admin Team Overview</h2>
+              <p>Company-wide funnel, shared pipeline totals, and per-agent performance.</p>
+            </div>
+            <div>
+              <select id="adminOverviewTeamFilter">
+                <option value="">All Teams</option>
+                <option value="Mike's Team">Mike's Team</option>
+                <option value="Chay Team">Chay Team</option>
+                <option value="Unassigned">Unassigned</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Active Agents</span>
+              <span class="admin-stat-value" id="adminTotalAgents">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Shared Leads</span>
+              <span class="admin-stat-value" id="adminSharedLeads">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Team Calls</span>
+              <span class="admin-stat-value" id="adminTotalCalls">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Appointments</span>
+              <span class="admin-stat-value" id="adminTotalAppointments">—</span>
+            </div>
+          </div>
+
+          <div class="admin-agent-card">
+            <div class="admin-agent-head">
+              <h3><i class="fas fa-people-group"></i> Agent Performance</h3>
+              <p>Each agent sees only their own overview and call log. Admin sees the full rollup here.</p>
+            </div>
+            <div class="leads-table-wrap">
+              <table class="leads-table admin-agent-table">
+                <thead>
+                  <tr>
+                    <th>Agent</th>
+                    <th>Team</th>
+                    <th>Calls</th>
+                    <th>Answered</th>
+                    <th>Presented</th>
+                    <th>Booked</th>
+                    <th>Answer Rate</th>
+                    <th>Pitch Rate</th>
+                    <th>Book Rate</th>
+                  </tr>
+                </thead>
+                <tbody id="agentMetricsBody">
+                  <tr><td colspan="9" class="loading-row">Loading team metrics...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent calls -->
+        <div class="recent-leads-card">
+          <h2 id="recentCallsTitle"><i class="fas fa-history"></i> Recent Call Activity</h2>
+          <div id="recentCallsList" class="recent-list">
+            <div class="empty-state"><i class="fas fa-phone"></i><p>Loading...</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== LEADS VIEW ============== -->
+      <section class="view" id="view-leads">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <div class="lead-title-row">
+                <h1>All Leads</h1>
+                <span class="lead-total-chip" id="leadTotalChip">0 total</span>
+              </div>
+              <p>Homeowners in your pipeline. Click any row to log a call or update status.</p>
+            </div>
+            <div class="header-actions">
+              <button id="openCsvImportBtn" class="btn-secondary btn-import">
+                <i class="fas fa-file-import"></i> Import CSV
+              </button>
+              <button id="addLeadBtn" class="btn-add">
+                <i class="fas fa-plus"></i> Add Lead
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="leads-toolbar leads-toolbar-location">
+          <input type="text" id="searchInput" placeholder="🔍 Search by name, phone, email, city, or county..." />
+          <input type="text" id="locationSearch" placeholder="📍 Filter by city, county, state, ZIP, or address..." />
+          <select id="stateFilter">
+            <option value="">All States</option>
+          </select>
+          <select id="countyFilter">
+            <option value="">All Counties</option>
+          </select>
+          <select id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="New">New</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Booked">Booked</option>
+            <option value="Closed">Closed</option>
+            <option value="Dead">Dead</option>
+          </select>
+          <select id="damageFilter">
+            <option value="">All Damage Types</option>
+            <option value="Water">Water</option>
+            <option value="Mold">Mold</option>
+            <option value="Fire">Fire</option>
+            <option value="Storm">Storm</option>
+            <option value="Multi">Multi</option>
+          </select>
+          <select id="organizeBy">
+            <option value="default">Organize: Newest</option>
+            <option value="state">Organize: State</option>
+            <option value="city">Organize: City</option>
+            <option value="county">Organize: County</option>
+            <option value="state_city">Organize: State → City</option>
+          </select>
+          <button id="refreshBtn" class="btn-refresh">
+            <i class="fas fa-sync"></i> Refresh
+          </button>
+        </div>
+
+        <div class="leads-table-wrap">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Location</th>
+                <th id="leadCountyHeader" class="lead-sortable-header" data-sort-key="county" scope="col" title="Sort by county">County <span class="lead-sort-indicator" id="leadCountySortIndicator">↕</span></th>
+                <th>Damage</th>
+                <th>Status</th>
+                <th>Calls</th>
+                <th>Last Contact</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <tr><td colspan="10" class="loading-row">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lead-pagination-bar">
+          <div class="lead-pagination-meta" id="leadPaginationMeta">Loading leads…</div>
+          <div class="lead-pagination-actions">
+            <button id="leadPrevPageBtn" class="btn-view" type="button">Previous</button>
+            <span class="lead-pagination-page" id="leadPageLabel">Page 1</span>
+            <button id="leadNextPageBtn" class="btn-view" type="button">Next</button>
+          </div>
+        </div>
+      </section>
+      <!-- ============== MESSAGES VIEW ============== -->
+      <section class="view" id="view-messages">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Messages</h1>
+              <p>Modern team chat for admins and agents with direct messages, group spaces, pins, and cleaner collaboration.</p>
+            </div>
+            <div class="header-actions">
+              <button id="messagesRefreshBtn" class="btn-secondary"><i class="fas fa-rotate"></i> Refresh</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="messages-shell">
+          <aside class="messages-sidebar-card messages-card-glass">
+            <div class="messages-search-wrap">
+              <i class="fas fa-magnifying-glass"></i>
+              <input id="messagesSearchInput" type="text" placeholder="Search chats, people, or previews…" />
+            </div>
+
+            <div class="messages-compose-card messages-card-glass">
+              <div class="messages-compose-head">
+                <h3><i class="fas fa-plus-circle"></i> Start a chat</h3>
+                <p>Create direct messages, named groups, and pinned team spaces.</p>
+              </div>
+
+              <div class="messages-compose-block">
+                <label class="messages-compose-label" for="messagesRecipientSelect">Direct message</label>
+                <div class="messages-compose-row">
+                  <select id="messagesRecipientSelect" class="messages-select">
+                    <option value="">Select teammate…</option>
+                  </select>
+                  <button id="messagesStartBtn" class="btn-add" type="button">Start</button>
+                </div>
+              </div>
+
+              <div class="messages-compose-separator"><span>Named group chat</span></div>
+
+              <div class="messages-compose-block">
+                <label class="messages-compose-label" for="messagesGroupNameInput">Group name</label>
+                <input id="messagesGroupNameInput" class="messages-input" type="text" maxlength="80" placeholder="Admin Team, Sales Floor, Morning Follow-Up…" />
+              </div>
+
+              <div class="messages-compose-block">
+                <label class="messages-compose-label">Select teammates</label>
+                <div id="messagesGroupChecklist" class="messages-group-checklist">
+                  <div class="messages-group-empty">No teammates available yet.</div>
+                </div>
+                <div class="messages-group-actions">
+                  <span class="messages-group-hint">Pick 2+ teammates to create a shared room.</span>
+                  <button id="messagesGroupStartBtn" class="btn-secondary" type="button">Create group</button>
+                </div>
+              </div>
+
+              <div id="messagesStatus" class="agent-admin-status hidden"></div>
+            </div>
+
+            <div class="messages-list-card messages-card-glass">
+              <div class="messages-list-head">
+                <div>
+                  <h3><i class="fas fa-comments"></i> Conversations</h3>
+                  <p>Pinned chats stay on top. Group chats show badges and avatars.</p>
+                </div>
+                <span id="messagesConversationCount" class="lead-total-chip">0 chats</span>
+              </div>
+              <div id="messagesConversationList" class="messages-conversation-list">
+                <div class="empty-state small"><i class="fas fa-comments"></i><p>No conversations yet.</p></div>
+              </div>
+            </div>
+          </aside>
+
+          <section class="messages-thread-card messages-card-glass">
+            <div class="messages-thread-head modern">
+              <div class="messages-thread-identity">
+                <div id="messagesThreadAvatar" class="messages-thread-avatar">M</div>
+                <div>
+                  <h2 id="messagesThreadTitle">Select a conversation</h2>
+                  <p id="messagesThreadMeta">Choose a teammate to start chatting.</p>
+                </div>
+              </div>
+              <div class="messages-thread-actions">
+                <button id="messagesPinBtn" class="btn-secondary" type="button"><i class="fas fa-thumbtack"></i> Pin</button>
+                <button id="messagesRenameBtn" class="btn-secondary" type="button"><i class="fas fa-pen"></i> Rename</button>
+                <button id="messagesManageBtn" class="btn-secondary" type="button"><i class="fas fa-user-gear"></i> Members</button>
+              </div>
+            </div>
+
+            <div id="messagesMembersBar" class="messages-members-bar hidden"></div>
+
+            <div id="messagesManagePanel" class="messages-manage-panel hidden">
+              <div class="messages-manage-grid">
+                <div class="messages-manage-card">
+                  <label class="messages-compose-label" for="messagesAddMemberSelect">Add member</label>
+                  <div class="messages-compose-row compact">
+                    <select id="messagesAddMemberSelect" class="messages-select">
+                      <option value="">Select teammate…</option>
+                    </select>
+                    <button id="messagesAddMemberBtn" class="btn-add" type="button">Add</button>
+                  </div>
+                </div>
+                <div class="messages-manage-card">
+                  <label class="messages-compose-label" for="messagesRemoveMemberSelect">Remove member</label>
+                  <div class="messages-compose-row compact">
+                    <select id="messagesRemoveMemberSelect" class="messages-select">
+                      <option value="">Select member…</option>
+                    </select>
+                    <button id="messagesRemoveMemberBtn" class="btn-danger" type="button">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="messagesThreadBody" class="messages-thread-body">
+              <div id="messagesEmptyState" class="empty-state"><i class="fas fa-paper-plane"></i><p>Pick a conversation or start a new one.</p></div>
+            </div>
+
+            <div id="messagesComposer" class="messages-composer hidden">
+              <textarea id="messagesInput" rows="3" placeholder="Type your message here…"></textarea>
+              <div class="messages-composer-actions">
+                <span class="messages-composer-hint">Enter to send · Shift+Enter for a new line · You can delete your own messages.</span>
+                <button id="messagesSendBtn" class="btn-save" type="button"><i class="fas fa-paper-plane"></i> Send</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ============== CALL LOG VIEW ============== -->
+      <section class="view" id="view-calls">
+        <header class="view-header">
+          <h1>Call Log</h1>
+          <p id="callLogIntro">Every call attempt — answered, presented, booked, or missed.</p>
+        </header>
+
+        <div class="leads-toolbar">
+          <select id="callOutcomeFilter">
+            <option value="">All Outcomes</option>
+            <option value="Booked">Booked</option>
+            <option value="Voicemail">Voicemail</option>
+            <option value="Hung up">Hung up</option>
+            <option value="Not interested">Not interested</option>
+            <option value="Callback requested">Callback requested</option>
+            <option value="Wrong number">Wrong number</option>
+          </select>
+          <select id="callTeamFilter">
+            <option value="">All Teams</option>
+            <option value="Mike's Team">Mike's Team</option>
+            <option value="Chay Team">Chay Team</option>
+            <option value="Unassigned">Unassigned</option>
+          </select>
+          <button id="refreshCallsBtn" class="btn-refresh">
+            <i class="fas fa-sync"></i> Refresh
+          </button>
+        </div>
+
+        <div class="leads-table-wrap">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Lead</th>
+                <th>Agent</th>
+                <th>Team</th>
+                <th>Answered</th>
+                <th>Presented</th>
+                <th>Booked</th>
+                <th>Outcome</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="callsTableBody">
+              <tr><td colspan="10" class="loading-row">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============== APPOINTMENTS VIEW ============== -->
+      <section class="view" id="view-appointments">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Appointments</h1>
+              <p>Scheduled inspections, calendar view, and outcome tracking.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button id="newApptBtn" class="btn-add">
+                <i class="fas fa-plus"></i> New Appointment
+              </button>
+              <button id="refreshApptsBtn" class="btn-refresh">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- KPI Row -->
+        <div class="appt-kpi">
+          <div class="kpi-card">
+            <div class="kpi-label">Upcoming</div>
+            <div class="kpi-value blue" id="kpiUpcoming">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">This Week</div>
+            <div class="kpi-value purple" id="kpiThisWeek">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Completed</div>
+            <div class="kpi-value green" id="kpiCompleted">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Signed</div>
+            <div class="kpi-value green" id="kpiSigned">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">No-show</div>
+            <div class="kpi-value amber" id="kpiNoshow">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Cancelled</div>
+            <div class="kpi-value red" id="kpiCancelled">—</div>
+          </div>
+        </div>
+
+        <!-- Sub-tabs -->
+        <div class="appt-tabs">
+          <button class="appt-tab active" data-tab="calendar"><i class="fas fa-calendar"></i> Calendar</button>
+          <button class="appt-tab" data-tab="upcoming"><i class="fas fa-clock"></i> Upcoming</button>
+          <button class="appt-tab" data-tab="all"><i class="fas fa-list"></i> All Appointments</button>
+        </div>
+
+        <!-- Calendar tab -->
+        <div class="appt-pane" id="pane-calendar">
+          <div class="calendar-card">
+            <div class="cal-header">
+              <div class="cal-title" id="calTitle">—</div>
+              <div class="cal-nav">
+                <button id="calPrev" title="Previous month"><i class="fas fa-chevron-left"></i></button>
+                <button id="calToday" class="cal-today-btn">Today</button>
+                <button id="calNext" title="Next month"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+            <div class="cal-weekdays">
+              <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+
+          <div class="upcoming-card">
+            <h2><i class="fas fa-bolt"></i> Next Up</h2>
+            <div id="calNextUpList"></div>
+          </div>
+        </div>
+
+        <!-- Upcoming tab -->
+        <div class="appt-pane hidden" id="pane-upcoming">
+          <div class="upcoming-card">
+            <h2><i class="fas fa-clock"></i> Upcoming Appointments</h2>
+            <div id="upcomingList"></div>
+          </div>
+        </div>
+
+        <!-- All appointments tab (table) -->
+        <div class="appt-pane hidden" id="pane-all">
+          <div class="leads-toolbar">
+            <select id="apptStatusFilter">
+              <option value="">All Statuses</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Completed">Completed</option>
+              <option value="No-show">No-show</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Signed">Signed</option>
+              <option value="Lost">Lost</option>
+            </select>
+            <select id="apptTeamFilter">
+              <option value="">All Teams</option>
+              <option value="Mike's Team">Mike's Team</option>
+              <option value="Chay Team">Chay Team</option>
+              <option value="Unassigned">Unassigned</option>
+            </select>
+          </div>
+
+          <div class="leads-table-wrap">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th>Scheduled For</th>
+                  <th>Lead</th>
+                  <th>Agent</th>
+                  <th>Team</th>
+                  <th>Phone</th>
+                  <th>Damage</th>
+                  <th>Status</th>
+                  <th>Outcome</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="apptsTableBody">
+                <tr><td colspan="9" class="loading-row">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== DIALER ============== -->
+      <section class="view" id="view-dialer">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Call Command</h1>
+              <p>Click-to-dial through Quo, with auto-logged calls, AI summaries, and live coaching playback. Agents use their assigned Quo number when they place calls.</p>
+            </div>
+            <div class="training-header-links">
+              <button type="button" class="btn-secondary" id="ccRefreshBtn">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+              <a class="btn-secondary" href="https://my.quo.com/inbox" target="_blank" rel="noopener">
+                <i class="fas fa-up-right-from-square"></i> Open Quo
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <div id="callCommandStatus" class="cc-status hidden"></div>
+
+        <div class="cc-shell">
+          <!-- Left: Today's stats + manual dial -->
+          <aside class="cc-sidebar">
+            <div class="cc-card">
+              <h3><i class="fas fa-chart-line"></i> Today</h3>
+              <div class="cc-stats">
+                <div class="cc-stat"><span>Calls</span><strong id="ccStatCalls">0</strong></div>
+                <div class="cc-stat"><span>Answered</span><strong id="ccStatAnswered">0</strong></div>
+                <div class="cc-stat"><span>Booked</span><strong id="ccStatBooked">0</strong></div>
+                <div class="cc-stat"><span>Answer rate</span><strong id="ccStatAnswerRate">0%</strong></div>
+              </div>
+            </div>
+
+            <div class="cc-card">
+              <h3><i class="fas fa-keyboard"></i> Manual Dial</h3>
+              <input type="tel" id="ccManualNumber" class="cc-input" placeholder="+1 (xxx) xxx-xxxx" />
+              <div class="cc-keypad">
+                <button type="button" class="cc-keypad-btn" data-digit="1">1</button>
+                <button type="button" class="cc-keypad-btn" data-digit="2">2</button>
+                <button type="button" class="cc-keypad-btn" data-digit="3">3</button>
+                <button type="button" class="cc-keypad-btn" data-digit="4">4</button>
+                <button type="button" class="cc-keypad-btn" data-digit="5">5</button>
+                <button type="button" class="cc-keypad-btn" data-digit="6">6</button>
+                <button type="button" class="cc-keypad-btn" data-digit="7">7</button>
+                <button type="button" class="cc-keypad-btn" data-digit="8">8</button>
+                <button type="button" class="cc-keypad-btn" data-digit="9">9</button>
+                <button type="button" class="cc-keypad-btn" data-digit="*">*</button>
+                <button type="button" class="cc-keypad-btn" data-digit="0">0</button>
+                <button type="button" class="cc-keypad-btn" data-digit="#">#</button>
+              </div>
+              <button type="button" class="btn-primary cc-call-now" id="ccManualCallBtn">
+                <i class="fas fa-phone"></i> Call Now
+              </button>
+            </div>
+          </aside>
+
+          <!-- Middle: Lead queue + recent call feed -->
+          <main class="cc-main">
+            <div class="cc-card">
+              <div class="cc-card-head">
+                <h3><i class="fas fa-list-ol"></i> Today's Call Queue</h3>
+                <span class="cc-muted">Uncalled leads first, prioritized by location and storm activity</span>
+              </div>
+              <div id="ccCallQueue" class="cc-queue">
+                <div class="cc-empty">Loading leads…</div>
+              </div>
+            </div>
+
+            <div class="cc-card">
+              <div class="cc-card-head">
+                <h3><i class="fas fa-clock-rotate-left"></i> Recent Calls (live)</h3>
+                <span class="cc-muted">Auto-updates every 15 seconds as Quo finishes calls</span>
+              </div>
+              <div id="ccRecentCalls" class="cc-recent">
+                <div class="cc-empty">No calls yet today.</div>
+              </div>
+            </div>
+          </main>
+
+          <!-- Right: Storm intel + standalone call prep -->
+          <aside class="cc-right-rail">
+            <section class="cc-detail" id="ccDetailPanel">
+              <div class="cc-empty">Click a lead in <strong>Today's Call Queue</strong> to preview the newest storms in that area before dialing, or click <strong>Details</strong> on a recent call to review the recording, AI summary, and disposition.</div>
+            </section>
+            <section class="cc-detail cc-prep-panel" id="ccPrepPanel">
+              <div class="cc-empty">Call Prep will appear here as its own section. Select a lead to load a rotating opener, objection handle, reassurance, and motivation.</div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+
+      <!-- ============== CONTRACTS SETUP ============== -->
+      <section class="view hidden" id="view-contracts-setup">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>DocuMike · One-Click Setup</h1>
+              <p>Run the database migrations, store your Postmark token, and verify outbound email — all from this page.</p>
+            </div>
+            <div class="header-actions">
+              <button id="contractsSetupRefreshBtn" class="btn-refresh" type="button"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+          </div>
+        </header>
+        <div id="contractsSetupStatus" class="agent-admin-status hidden"></div>
+        <div id="contractsSetupBody" class="contracts-setup-body">
+          <div class="empty-state"><i class="fas fa-rocket"></i><p>Loading setup status…</p></div>
+        </div>
+      </section>
+
+      <!-- ============== PARTNER CONTRACTS ============== -->
+      <section class="view hidden" id="view-partner-contracts">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>DocuMike</h1>
+              <p>DocuSign-style workspace for partner templates, signature requests, routing order, and status tracking.</p>
+            </div>
+            <div class="header-actions partner-contracts-header-actions">
+              <button id="partnerContractsAddTemplateBtn" class="btn-add" type="button"><i class="fas fa-upload"></i> Add Template</button>
+              <button id="partnerContractsCreateRequestBtn" class="btn-secondary" type="button"><i class="fas fa-paper-plane"></i> New Request</button>
+              <a href="/contract-signing/portal.html" target="_blank" rel="noopener noreferrer" class="btn-secondary"><i class="fas fa-mobile-screen"></i> In-Person Signing</a>
+              <button id="partnerContractsSettingsBtn" class="btn-secondary" type="button" title="Open DocuMike Settings (migrations, Postmark email, webhook)"><i class="fas fa-gear"></i> Settings</button>
+              <button id="partnerContractsRefreshBtn" class="btn-refresh" type="button"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="partnerContractsStatus" class="agent-admin-status hidden"></div>
+
+        <div id="partnerContractsScopeWrap" class="partner-contracts-scope hidden">
+          <div class="form-group">
+            <label>Viewing Partner</label>
+            <select id="partnerContractsPartnerFilter"></select>
+          </div>
+          <label class="check-row compact-check partner-contracts-toggle-row">
+            <input type="checkbox" id="partnerContractsSelectedOnly" />
+            <span><strong>Show selected partner only</strong></span>
+          </label>
+        </div>
+
+        <div class="partner-contracts-kpi-grid">
+          <div class="admin-stat-card"><span class="admin-stat-label">Templates</span><span class="admin-stat-value" id="pcKpiTemplates">—</span></div>
+          <div class="admin-stat-card"><span class="admin-stat-label">Draft Requests</span><span class="admin-stat-value" id="pcKpiDraft">—</span></div>
+          <div class="admin-stat-card"><span class="admin-stat-label">Awaiting Signature</span><span class="admin-stat-value" id="pcKpiAwaiting">—</span></div>
+          <div class="admin-stat-card"><span class="admin-stat-label">Signed</span><span class="admin-stat-value" id="pcKpiSigned">—</span></div>
+          <div class="admin-stat-card"><span class="admin-stat-label">Declined / Closed</span><span class="admin-stat-value" id="pcKpiDeclined">—</span></div>
+          <div class="admin-stat-card"><span class="admin-stat-label">Expiring Soon</span><span class="admin-stat-value" id="pcKpiExpiring">—</span></div>
+        </div>
+
+        <div class="partner-contracts-layout">
+          <div class="partner-contracts-main-col">
+            <div class="partner-contracts-card">
+              <div class="partner-contracts-section-head">
+                <h2><i class="fas fa-layer-group"></i> Template Library</h2>
+                <span id="partnerContractsTemplatesCount" class="storm-chip">0 templates</span>
+              </div>
+              <div class="leads-table-wrap partner-contracts-table-wrap">
+                <table class="leads-table partner-contracts-table">
+                  <thead>
+                    <tr>
+                      <th>Template</th>
+                      <th>Partner</th>
+                      <th>Versions</th>
+                      <th>Status</th>
+                      <th>Updated</th>
+                    </tr>
+                  </thead>
+                  <tbody id="partnerContractsTemplatesBody">
+                    <tr><td colspan="5" class="loading-row">Open DocuMike to load template scaffolding.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="partner-contracts-card">
+              <div class="partner-contracts-section-head">
+                <h2><i class="fas fa-paper-plane"></i> Signature Requests</h2>
+                <span id="partnerContractsRequestsCount" class="storm-chip">0 requests</span>
+              </div>
+              <div class="leads-table-wrap partner-contracts-table-wrap">
+                <table class="leads-table partner-contracts-table">
+                  <thead>
+                    <tr>
+                      <th>Request</th>
+                      <th>Partner</th>
+                      <th>Client</th>
+                      <th>Status</th>
+                      <th>Signed</th>
+                      <th>Next Signer</th>
+                      <th>Updated</th>
+                    </tr>
+                  </thead>
+                  <tbody id="partnerContractsRequestsBody">
+                    <tr><td colspan="7" class="loading-row">Request tracking scaffold will load here.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="partner-contracts-detail-card">
+            <div class="partner-contracts-section-head">
+              <h2 id="partnerContractsDetailTitle"><i class="fas fa-rectangle-list"></i> Details</h2>
+              <span id="partnerContractsDetailBadge" class="status-pill status-New">Scaffold</span>
+            </div>
+            <div id="partnerContractsDetailBody">
+              <div class="empty-state"><i class="fas fa-file-contract"></i><p>Select a template or request to inspect the DocuMike scaffold.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== SIGNED CLIENTS ============== -->
+      <section class="view hidden" id="view-signed-clients">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Signed Clients</h1>
+              <p>Track partner-owned signed jobs, deal items, incoming vs outgoing payments, and private payout terms.</p>
+            </div>
+            <div class="header-actions signed-clients-header-actions">
+              <button id="signedClientsAddBtn" class="btn-add"><i class="fas fa-plus"></i> Add Signed Client</button>
+              <button id="signedClientsLogTxnBtn" class="btn-secondary" type="button"><i class="fas fa-money-bill-transfer"></i> Log Transaction</button>
+              <button id="signedClientsAddDealBtn" class="btn-secondary" type="button"><i class="fas fa-list-check"></i> Add Deal Item</button>
+              <button id="signedClientsExportBtn" class="btn-secondary" type="button"><i class="fas fa-file-export"></i> Export CSV</button>
+              <button id="signedClientsRefreshBtn" class="btn-refresh" type="button"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="signedClientsStatus" class="agent-admin-status hidden"></div>
+
+        <div id="signedClientsScopeWrap" class="signed-clients-scope hidden">
+          <div class="form-group">
+            <label>Viewing Partner</label>
+            <select id="signedClientsPartnerFilter"></select>
+          </div>
+          <label class="check-row compact-check signed-clients-toggle-row">
+            <input type="checkbox" id="signedClientsSelectedOnly" />
+            <span><strong>Show selected partner only</strong></span>
+          </label>
+        </div>
+
+        <div class="signed-clients-scroll-shell">
+          <div class="signed-clients-filter-grid">
+            <div class="form-group signed-clients-search-group">
+              <label>Search</label>
+              <input type="text" id="signedClientsSearch" placeholder="Search client, address, partner, transaction, or note" />
+            </div>
+            <div class="form-group">
+              <label>Client Status</label>
+              <select id="signedClientsClientStatusFilter">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="on_hold">On Hold</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Financial Status</label>
+              <select id="signedClientsFinancialStatusFilter">
+                <option value="">All</option>
+                <option value="no_items">No Items</option>
+                <option value="due">Due</option>
+                <option value="partial">Partial</option>
+                <option value="settled">Settled</option>
+                <option value="mixed">Mixed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Direction</label>
+              <select id="signedClientsDirectionFilter">
+                <option value="">All</option>
+                <option value="incoming">Incoming</option>
+                <option value="outgoing">Outgoing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Payment Method</label>
+              <select id="signedClientsPaymentMethodFilter">
+                <option value="">All</option>
+                <option value="zelle">Zelle</option>
+                <option value="cash">Cash</option>
+                <option value="check">Check</option>
+                <option value="wire">Wire</option>
+                <option value="ach">ACH</option>
+                <option value="card">Card</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Sort By</label>
+              <select id="signedClientsSortBy">
+                <option value="newest">Newest Signed</option>
+                <option value="oldest">Oldest Signed</option>
+                <option value="highest_net">Highest Net</option>
+                <option value="largest_outstanding">Largest Outstanding</option>
+                <option value="recently_paid">Recently Paid</option>
+                <option value="client_name">Client Name</option>
+                <option value="partner_name">Partner Name</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="signed-clients-scroll-shell">
+          <div class="signed-clients-kpi-grid">
+            <div class="admin-stat-card"><span class="admin-stat-label">Active Signed Clients</span><span class="admin-stat-value" id="signedClientsKpiActive">—</span></div>
+            <div class="admin-stat-card"><span class="admin-stat-label">Total Incoming</span><span class="admin-stat-value" id="signedClientsKpiIncoming">—</span><span class="admin-stat-meta" id="signedClientsKpiIncomingMeta">Received: —</span></div>
+            <div class="admin-stat-card"><span class="admin-stat-label">Total Outgoing</span><span class="admin-stat-value" id="signedClientsKpiOutgoing">—</span><span class="admin-stat-meta" id="signedClientsKpiOutgoingMeta">Paid: —</span></div>
+            <div class="admin-stat-card"><span class="admin-stat-label">Net Balance</span><span class="admin-stat-value" id="signedClientsKpiNet">—</span><span class="admin-stat-meta" id="signedClientsKpiNetMeta">Actual net: —</span></div>
+            <div class="admin-stat-card"><span class="admin-stat-label">Outstanding Receivables</span><span class="admin-stat-value" id="signedClientsKpiReceivable">—</span></div>
+            <div class="admin-stat-card"><span class="admin-stat-label">Outstanding Payables</span><span class="admin-stat-value" id="signedClientsKpiPayable">—</span></div>
+          </div>
+        </div>
+
+        <div class="signed-clients-layout">
+          <div class="signed-clients-table-card">
+            <div class="signed-clients-section-head">
+              <h2><i class="fas fa-briefcase"></i> Signed Clients</h2>
+              <span id="signedClientsTableCount" class="storm-chip">0 clients</span>
+            </div>
+            <div class="leads-table-wrap signed-clients-table-wrap">
+              <table class="leads-table signed-clients-table">
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Partner</th>
+                    <th>Signed Date</th>
+                    <th>Property Address</th>
+                    <th>Service</th>
+                    <th>Revenue</th>
+                    <th>Profit</th>
+                    <th>Deal Terms</th>
+                    <th>Incoming</th>
+                    <th>Outgoing</th>
+                    <th>Net</th>
+                    <th>Job</th>
+                    <th>Financial</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="signedClientsTableBody">
+                  <tr><td colspan="14" class="loading-row">Open Signed Clients to load partner deals and client payment tracking.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="signed-clients-detail-card">
+            <div class="signed-clients-section-head">
+              <h2><i class="fas fa-address-card"></i> Client Details</h2>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button id="signedClientsEditBtn" class="btn-view hidden" type="button"><i class="fas fa-pen-to-square"></i> Edit Client</button>
+                <button id="signedClientsAllTransactionsBtn" class="btn-secondary" type="button"><i class="fas fa-table-list"></i> Viewing Full Ledger</button>
+                <span id="signedClientsDetailBadge" class="status-pill status-active">All transactions</span>
+              </div>
+            </div>
+            <div id="signedClientsEmptyState" class="empty-state signed-clients-empty-state hidden"><i class="fas fa-file-signature"></i><p>Select a signed client to view deal items, totals, and the payment ledger.</p></div>
+            <div id="signedClientsDetailContent" class="hidden">
+              <div class="signed-clients-detail-grid">
+                <div class="settings-card signed-clients-mini-card"><h3>Client Info</h3><div id="signedClientsDetailInfo"></div></div>
+                <div class="settings-card signed-clients-mini-card"><h3>Financial Summary</h3><div id="signedClientsFinancialSummary" class="signed-clients-summary-grid"></div></div>
+              </div>
+              <div class="settings-card">
+                <div class="signed-clients-section-head"><h3><i class="fas fa-list-check"></i> Deal Items</h3><button id="signedClientsAddDealInlineBtn" class="btn-secondary" type="button"><i class="fas fa-plus"></i> Add Deal Item</button></div>
+                <div class="leads-table-wrap signed-clients-subtable-wrap">
+                  <table class="leads-table signed-clients-subtable">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Direction</th>
+                        <th>Calculation</th>
+                        <th>Rate / Amount</th>
+                        <th>Quantity</th>
+                        <th>Expected Total</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="signedClientsDealItemsBody">
+                      <tr><td colspan="10" class="loading-row">No deal items loaded.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="settings-card">
+                <div class="signed-clients-section-head"><h3><i class="fas fa-money-bill-wave"></i> Transaction Ledger</h3><button id="signedClientsLogTxnInlineBtn" class="btn-secondary" type="button"><i class="fas fa-plus"></i> Log Transaction</button></div>
+                <div class="leads-table-wrap signed-clients-subtable-wrap">
+                  <table class="leads-table signed-clients-subtable">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Partner</th>
+                        <th>Client</th>
+                        <th>Direction</th>
+                        <th>Type</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Applied To</th>
+                        <th>Amount</th>
+                        <th>Recorded By</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="signedClientsTransactionsBody">
+                      <tr><td colspan="12" class="loading-row">No transactions loaded.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== ADMIN MANAGE AGENTS ============== -->
+      <section class="view hidden" id="view-agent-admin">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Manage Agents</h1>
+              <p>Create logins, remove agents, reset passwords, and turn admin access on or off without leaving the dashboard.</p>
+            </div>
+            <button id="refreshAgentsBtn" class="btn-refresh">
+              <i class="fas fa-sync"></i> Refresh Agents
+            </button>
+          </div>
+        </header>
+
+        <div id="agentAdminStatus" class="agent-admin-status hidden"></div>
+
+        <div class="agent-admin-grid">
+          <div class="settings-card agent-create-card">
+            <h3><i class="fas fa-user-plus"></i> Add Agent</h3>
+            <p class="agent-card-sub">Create a login for a new team member and optionally give admin access right away.</p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" id="agentDisplayName" placeholder="Abigail" />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="agentEmail" placeholder="agent@example.com" />
+              </div>
+              <div class="form-group">
+                <label>Temporary Password</label>
+                <input type="text" id="agentPassword" placeholder="At least 8 characters" />
+              </div>
+              <div class="form-group">
+                <label>Access Level</label>
+                <div class="agent-role-toggle">
+                  <label class="check-row compact-check">
+                    <input type="checkbox" id="agentMakeAdmin" />
+                    <span><strong>Give admin access</strong></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-actions" style="margin-top:12px;">
+              <button id="addAgentBtn" class="btn-add"><i class="fas fa-user-plus"></i> Add Agent</button>
+            </div>
+          </div>
+
+          <div class="agent-summary-grid">
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Total Logins</span>
+              <span class="admin-stat-value" id="agentSummaryTotal">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Admins</span>
+              <span class="admin-stat-value" id="agentSummaryAdmins">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Agents</span>
+              <span class="admin-stat-value" id="agentSummaryAgents">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Last Sign-In</span>
+              <span class="admin-stat-value agent-summary-small" id="agentSummaryLastSeen">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="leads-table-wrap agent-table-wrap">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Team</th>
+                <th>Created</th>
+                <th>Last Sign-In</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="managedAgentsBody">
+              <tr><td colspan="7" class="loading-row">Admins can manage logins here once the backend is connected.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="settings-card agent-performance-card">
+          <div class="admin-agent-head">
+            <h3><i class="fas fa-chart-line"></i> Agent Stats</h3>
+            <p>Track every individual agent's call volume, bookings, appointments, revenue, and latest activity from one admin screen.</p>
+          </div>
+
+          <div class="admin-stats-grid agent-performance-summary">
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Team Calls</span>
+              <span class="admin-stat-value" id="perfTeamCalls">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Booked Calls</span>
+              <span class="admin-stat-value" id="perfTeamBooked">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Upcoming Appointments</span>
+              <span class="admin-stat-value" id="perfTeamUpcoming">—</span>
+            </div>
+            <div class="admin-stat-card">
+              <span class="admin-stat-label">Signed Revenue</span>
+              <span class="admin-stat-value" id="perfTeamRevenue">—</span>
+            </div>
+          </div>
+
+          <div class="leads-table-wrap agent-table-wrap">
+            <table class="leads-table admin-agent-table">
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Role</th>
+                  <th>Team</th>
+                  <th>Calls Today</th>
+                  <th>Total Calls</th>
+                  <th>Answered</th>
+                  <th>Booked</th>
+                  <th>Upcoming Appts</th>
+                  <th>Completed</th>
+                  <th>Signed $</th>
+                  <th>Last Activity</th>
+                </tr>
+              </thead>
+              <tbody id="agentPerformanceBody">
+                <tr><td colspan="11" class="loading-row">Loading agent performance...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===== Quo Number Assignments ===== -->
+        <div class="settings-card" style="margin-top:24px;">
+          <div class="cc-card-head">
+            <h3><i class="fas fa-phone-flip"></i> Quo Number Assignments</h3>
+            <button type="button" class="btn-refresh" id="refreshAssignmentsBtn">
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
+          <p class="agent-card-sub">Each agent gets ONE of your 3 Quo numbers. When they click "Call" on a lead, the dashboard tells Quo to dial from that assigned number so caller-ID matches the agent's territory. Only 1 Quo seat is used (yours) — agents log into Quo with your shared credentials.</p>
+
+          <div id="assignmentsStatus" class="agent-admin-status hidden"></div>
+
+          <div class="leads-table-wrap" style="margin-top:14px;">
+            <table class="leads-table admin-agent-table">
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Team</th>
+                  <th>Email</th>
+                  <th>Assigned Quo Number</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="agentAssignmentsBody">
+                <tr><td colspan="6" class="loading-row">Loading agents and numbers...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:16px;padding:14px;background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;border-radius:6px;">
+            <strong style="color:#fde68a;"><i class="fas fa-triangle-exclamation"></i> Flag a number</strong>
+            <p style="margin:6px 0 0 0;color:#cbd5e1;font-size:13px;">If one of your Quo numbers starts getting "Scam Likely" labels or low answer rates, click <strong>Flag</strong> next to it. Calls from that agent will show a warning banner on Call Command until you reassign them to a different number or clear the flag.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== MAP MODE ============== -->
+      <section class="view" id="view-map">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Storm Intel</h1>
+              <p>Real-time Florida hail, 40+ mph wind, and tornado intelligence. Merges NOAA Storm Events history with NOAA SPC preliminary reports updated multiple times daily.</p>
+            </div>
+            <div class="training-header-links">
+              <button type="button" class="btn-secondary" id="stormRefreshBtn">
+                <i class="fas fa-rotate"></i> Refresh Storm Feed
+              </button>
+              <a class="btn-secondary" href="https://www.ncei.noaa.gov/stormevents/" rel="noopener" target="_blank">
+                <i class="fas fa-database"></i> NOAA Storm Data
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <div class="mapmode-shell">
+          <div class="mapmode-main-card">
+            <div class="mapmode-topbar">
+              <div>
+                <h3><i class="fas fa-cloud-bolt"></i> Florida Severe Report Board</h3>
+                <p>Historical NOAA storm reports for hail and 40+ mph wind events across Florida.</p>
+              </div>
+              <div class="mapmode-chip-row" id="stormStateChips">
+                <span class="storm-chip active">Loading states…</span>
+              </div>
+            </div>
+
+            <div class="mapmode-board">
+              <div class="mapmode-board-glow"></div>
+              <div class="mapmode-board-grid"></div>
+              <div class="mapmode-board-legend">
+                <span><i class="fas fa-circle" style="color:#38bdf8"></i> Hail report</span>
+                <span><i class="fas fa-circle" style="color:#f59e0b"></i> Wind 40+ mph</span>
+                <span><i class="fas fa-circle" style="color:#a855f7"></i> Tornado</span>
+                <span><i class="fas fa-circle" style="color:#ef4444"></i> Latest activity</span>
+              </div>
+              <div class="mapmode-board-label">All Florida Reports</div>
+              <div class="storm-report-toolbar">
+                <div class="storm-filter-group" id="stormFilterGroup">
+                  <button type="button" class="storm-filter-btn active" data-storm-filter="all">All Reports</button>
+                  <button type="button" class="storm-filter-btn" data-storm-filter="wind">Wind 40+</button>
+                  <button type="button" class="storm-filter-btn" data-storm-filter="hail">Hail</button>
+                  <button type="button" class="storm-filter-btn" data-storm-filter="tornado">Tornado</button>
+                  <button type="button" class="storm-filter-btn" data-storm-filter="recent">Last 14 Days</button>
+                </div>
+                <label class="storm-search-wrap">
+                  <i class="fas fa-search"></i>
+                  <input type="search" id="stormReportSearchInput" placeholder="Search county, city, event type" />
+                </label>
+              </div>
+              <div class="storm-report-results-meta">
+                <span id="stormReportResultsLabel">Loading full Florida report list…</span>
+                <span class="mono" id="stormReportWindowLabel">Past 12 months</span>
+              </div>
+              <div id="stormAreasGrid" class="storm-areas-grid storm-areas-grid-full">
+                <div class="empty-state small"><i class="fas fa-cloud-bolt"></i><p>Loading Florida hail and wind reports from NOAA…</p></div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="mapmode-sidebar">
+            <div class="mapmode-card mapmode-stats-card">
+              <h3><i class="fas fa-chart-column"></i> Storm Snapshot</h3>
+              <div class="mapmode-kpis">
+                <div class="mapmode-kpi">
+                  <span>Hail reports</span>
+                  <strong id="stormAlertCount">—</strong>
+                </div>
+                <div class="mapmode-kpi">
+                  <span>Wind 40+ mph</span>
+                  <strong id="stormHighCount">—</strong>
+                </div>
+                <div class="mapmode-kpi">
+                  <span>Tornadoes</span>
+                  <strong id="stormTornadoCount">—</strong>
+                </div>
+                <div class="mapmode-kpi">
+                  <span>Counties hit</span>
+                  <strong id="stormLeadCount">—</strong>
+                </div>
+                <div class="mapmode-kpi wide">
+                  <span>Latest report</span>
+                  <strong id="stormUpdatedAt">—</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="mapmode-card">
+              <div class="panel-row-head">
+                <h3><i class="fas fa-map-location-dot"></i> County Hot List</h3>
+                <span class="mono">Florida counties ranked by report volume</span>
+              </div>
+              <div id="stormLeadQueue" class="storm-lead-queue">
+                <div class="empty-state small"><i class="fas fa-map"></i><p>County rankings will appear once Florida reports finish loading.</p></div>
+              </div>
+            </div>
+
+            <div class="mapmode-card">
+              <div class="panel-row-head">
+                <h3><i class="fas fa-layer-group"></i> Storm Report Summary</h3>
+                <span class="mono">Free NOAA + NWS sources only</span>
+              </div>
+              <div class="storm-source-list">
+                <div class="storm-source-card">
+                  <strong>NOAA Storm Events</strong>
+                  <p>Official Florida hail and wind event history from NOAA/NCEI.</p>
+                </div>
+                <div class="storm-source-card">
+                  <strong>NWS Alerts API</strong>
+                  <p>Free government alert feed for current Florida weather warnings.</p>
+                </div>
+                <div class="storm-source-card">
+                  <strong>RainViewer Radar</strong>
+                  <p>Free radar freshness signal so the map tab stays current without paid APIs.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============== TRAINING ============== -->
+      <section class="view" id="view-training">
+        <header class="view-header">
+          <div class="header-flex">
+            <div>
+              <h1>Training Mode</h1>
+              <p>Mobile-friendly drills, objection reps, and one-tap access to your live call sheets.</p>
+            </div>
+            <div class="training-header-links">
+              <button type="button" class="btn-secondary" id="trainingRefreshProgressBtn">
+                <i class="fas fa-rotate"></i> Refresh Progress
+              </button>
+              <a class='btn-secondary' href='/dashboard/training/roofing_callsheet.html' rel='noopener' target='_blank'>
+                <i class="fas fa-external-link-alt"></i> Open Roofing Full Page
+              </a>
+              <a class='btn-secondary' href='/dashboard/training/plumbing_callsheet.html' rel='noopener' target='_blank'>
+                <i class="fas fa-external-link-alt"></i> Open Plumbing Full Page
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <div class="training-mode-shell">
+          <div class="training-mode-grid">
+            <div class="training-hub-card training-kpi-card">
+              <div class="panel-row-head">
+                <h3><i class="fas fa-fire"></i> Daily Training Pulse</h3>
+                <span class="mono">Built for quick mobile reps</span>
+              </div>
+              <div class="training-kpi-grid">
+                <div class="training-kpi-box">
+                  <span>Module</span>
+                  <strong id="trainingCurrentModuleStat">Roofing</strong>
+                </div>
+                <div class="training-kpi-box">
+                  <span>Drill step</span>
+                  <strong id="trainingDrillStepStat">1 / 3</strong>
+                </div>
+                <div class="training-kpi-box">
+                  <span>Completed today</span>
+                  <strong id="trainingCompletedTodayStat">0</strong>
+                </div>
+                <div class="training-kpi-box">
+                  <span>Mastered</span>
+                  <strong id="trainingMasteredStat">0</strong>
+                </div>
+              </div>
+              <div id="trainingSyncStatus" class="training-sync-status">Loading saved progress…</div>
+            </div>
+
+            <div class="training-hub-card training-focus-card">
+              <div class="panel-row-head">
+                <h3><i class="fas fa-bullhorn"></i> Drill Focus</h3>
+                <span class="mono">Tap through fast practice reps</span>
+              </div>
+              <div class="training-module-list training-module-list-modern">
+                <button type="button" class="training-module-btn active" data-training-module="roofing">
+                  <span class="training-module-icon"><i class="fas fa-house-damage"></i></span>
+                  <span>
+                    <strong>Roofing</strong>
+                    <small>Storm urgency, neighborhood opener, and inspection booking.</small>
+                  </span>
+                </button>
+                <button type="button" class="training-module-btn" data-training-module="plumbing">
+                  <span class="training-module-icon"><i class="fas fa-faucet-drip"></i></span>
+                  <span>
+                    <strong>Plumbing</strong>
+                    <small>Water-loss triage, trust building, and appointment close.</small>
+                  </span>
+                </button>
+              </div>
+
+              <div class="training-drill-card">
+                <div class="training-drill-badge">Today’s rep</div>
+                <h3 id="trainingScenarioTitle">Roofing opener sprint</h3>
+                <p id="trainingScenarioBody">Practice a short opener that mentions recent local storm activity and quickly asks for permission to inspect.</p>
+                <div class="training-drill-actions">
+                  <button type="button" class="btn-add" id="trainingStartDrillBtn"><i class="fas fa-play"></i> Start Drill</button>
+                  <button type="button" class="btn-secondary" id="trainingNextDrillBtn"><i class="fas fa-forward"></i> Next Rep</button>
+                  <button type="button" class="btn-secondary" id="trainingMarkMasteredBtn"><i class="fas fa-check"></i> Mark Mastered</button>
+                </div>
+              </div>
+
+              <div id="trainingCueList" class="training-cue-list"></div>
+            </div>
+
+            <div class="training-hub-card training-objection-card">
+              <div class="panel-row-head">
+                <h3><i class="fas fa-headset"></i> Objection Practice</h3>
+                <span class="mono">Quick rebuttals for the field</span>
+              </div>
+              <div id="trainingObjectionList" class="training-objection-list"></div>
+            </div>
+
+            <div class="training-viewer-card training-viewer-card-modern">
+              <div class="training-viewer-topbar">
+                <div>
+                  <h3 id="trainingFrameTitle">Roofing Call Sheet</h3>
+                  <p id="trainingFrameSubtitle">Updated Rapid Roofing roofing script with a tighter storm-based opener and embedded training video.</p>
+                </div>
+                <a class='btn-add training-open-btn' href='/dashboard/training/roofing_callsheet.html' id='trainingOpenLink' rel='noopener' target='_blank'>
+                  <i class="fas fa-arrow-up-right-from-square"></i> Open Active Training
+                </a>
+              </div>
+              <div class="training-mini-note">
+                <span><i class="fas fa-mobile-screen-button"></i> Designed for one-hand mobile review between calls</span>
+                <span><i class="fas fa-layer-group"></i> Use the drill cards above, then jump into the full script below</span>
+              </div>
+              <div class="training-frame-wrap">
+                <iframe id="trainingFrame" class="training-frame" title="Training Call Sheet" loading="lazy"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== SETTINGS ============== -->
+      <section class="view" id="view-settings">
+        <header class="view-header">
+          <h1>Settings</h1>
+          <p>Account info & quick links.</p>
+        </header>
+        <div class="settings-card">
+          <h3>Account</h3>
+          <p><strong>Email:</strong> <span id="settingsEmail">—</span></p>
+          <p><strong>Role:</strong> <span id="settingsRole">Agent</span></p>
+          <p><strong>User ID:</strong> <span id="settingsUserId" class="mono">—</span></p>
+        </div>
+        <div class="settings-card">
+          <h3>Connection</h3>
+          <p><strong>Supabase Project:</strong> <span class="mono">wzqlvyjhbdqflypdzcxs</span></p>
+          <p><strong>Status:</strong> <span class="status-pill status-Signed">Connected</span></p>
+        </div>
+        <div class="settings-card pwa-install-card">
+          <h3>Install App</h3>
+          <p id="pwaInstallStatus">Install this dashboard on your phone or desktop for faster access and an app-like full-screen experience.</p>
+          <div class="modal-actions" style="margin-top:12px;justify-content:flex-start;">
+            <button id="pwaInstallBtn" class="btn-secondary hidden" type="button"><i class="fas fa-download"></i> Install App</button>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h3>Setup Help</h3>
+          <p>If your tables aren't set up yet, run the SQL files in Supabase:</p>
+          <p><span class="mono">dashboard/supabase_schema_v2.sql</span></p>
+          <p><span class="mono">dashboard/admin_role_setup.sql</span></p>
+          <p><span class="mono">dashboard/dialer_schema_v16.sql</span></p>
+          <p><span class="mono">dashboard/signed_clients_schema_v15.sql</span></p>
+          <p><span class="mono">dashboard/messages_schema.sql</span></p>
+          <p><span class="mono">dashboard/training_progress_schema.sql</span></p>
+          <p style="margin-top:10px;color:var(--muted);font-size:.85rem;">Run the V2 schema first, then the admin-role setup file, then the dialer v16 schema, then the signed-clients v15 schema, then the messages schema, then the training progress schema.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ====== PARTNER CONTRACTS TEMPLATE MODAL ====== -->
+  <!-- ====== DOCUMIKE APPOINTMENT WIZARD MODAL (v3.5.0) ====== -->
+  <div id="documikeWizardModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-modal documike-wizard-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2><i class="fas fa-wand-magic-sparkles"></i> DocuMike Wizard</h2>
+      <p class="modal-sub">Send a contract for the appointment client. Pick a partner, pick a template, fill the blanks, and send.</p>
+      <div id="documikeWizardStatus" class="agent-admin-status hidden"></div>
+      <div id="documikeWizardBody" class="documike-wizard-body">
+        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading wizard…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== DOCUMIKE SETTINGS MODAL (Step 1: helper SQL, Step 2: migrations, Step 3: Postmark, Step 4: webhook) ====== -->
+  <div id="documikeSettingsModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-modal documike-settings-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2><i class="fas fa-gear"></i> DocuMike Settings</h2>
+      <p class="modal-sub">Run database migrations, manage your Postmark email sender, and rotate the webhook secret. This page replaces the old “Contracts Setup” tab.</p>
+      <div id="documikeSettingsSlot" class="documike-settings-slot">
+        <div class="empty-state"><i class="fas fa-gear"></i><p>Loading settings…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="partnerContractsTemplateModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="partnerContractsTemplateModalTitle"><i class="fas fa-upload"></i> Create Template + Version</h2>
+      <p class="modal-sub">Create the template record and its first version for the selected partner. File upload wiring can be added in the next step; this modal already supports metadata, storage path, and merge token JSON.</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Partner</label><select id="pct_partner_profile_id"></select></div>
+        <div class="form-group"><label>Template Name</label><input type="text" id="pct_template_name" placeholder="Alex roofing contingency" /></div>
+        <div class="form-group"><label>Template Slug</label><input type="text" id="pct_template_slug" placeholder="Optional auto-friendly slug" /></div>
+        <div class="form-group"><label>Category</label><input type="text" id="pct_template_category" placeholder="Roofing, plumbing, mitigation..." /></div>
+        <div class="form-group"><label>Version Label</label><input type="text" id="pct_version_label" value="v1" /></div>
+        <div class="form-group"><label>Version Status</label><select id="pct_version_status"><option value="draft">Draft</option><option value="ready">Ready</option><option value="archived">Archived</option></select></div>
+        <div class="form-group"><label>Source File Name</label><input type="text" id="pct_source_file_name" placeholder="alex-contract-template.pdf" /></div>
+        <div class="form-group"><label>Source File URL</label><input type="text" id="pct_source_file_url" placeholder="Optional file URL or wrapper URL" /></div>
+        <div class="form-group"><label>MIME Type</label><input type="text" id="pct_source_file_mime_type" placeholder="application/pdf" /></div>
+        <div class="form-group"><label>Storage Object Path</label><input type="text" id="pct_storage_object_path" placeholder="partner-contracts/alex/template-v1.pdf" /></div>
+      </div>
+      <div class="form-group full"><label>Upload Template File (PDF, DOCX, etc.)</label><input type="file" id="pct_file_upload" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /><small class="partner-contracts-helper-copy">Uploads go to the secure Supabase Storage bucket <code>partner-contracts</code> after the template version is created.</small></div>
+      <div class="form-group full"><label>Description</label><textarea id="pct_template_description" rows="3" placeholder="What this template is for and when the team should use it"></textarea></div>
+      <div class="form-group full"><label>Version Notes</label><textarea id="pct_version_notes" rows="3" placeholder="Changes, signer rules, or internal setup notes"></textarea></div>
+      <div class="form-grid">
+        <div class="form-group full"><label>Field Manifest JSON</label><textarea id="pct_field_manifest_json" class="mono" rows="5" placeholder='[]'></textarea></div>
+        <div class="form-group full"><label>Merge Tokens JSON</label><textarea id="pct_merge_tokens_json" class="mono" rows="5" placeholder='[]'></textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button id="partnerContractsTemplateSaveBtn" class="btn-save" type="button"><i class="fas fa-save"></i> Create Template + Version</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PARTNER CONTRACTS REQUEST BUILDER ====== -->
+  <div id="partnerContractsRequestModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-modal partner-contracts-request-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="partnerContractsRequestModalTitle"><i class="fas fa-paper-plane"></i> New Signature Request</h2>
+      <p class="modal-sub">Pick a partner template version, define signer routing order, and prepare the email message that will be used for signature delivery.</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Partner</label><select id="pcr_partner_profile_id"></select></div>
+        <div class="form-group"><label>Template</label><select id="pcr_template_id"></select></div>
+        <div class="form-group"><label>Template Version</label><select id="pcr_template_version_id"></select></div>
+        <div class="form-group"><label>Expires At</label><input type="datetime-local" id="pcr_expires_at" /></div>
+        <div class="form-group"><label>Request Title</label><input type="text" id="pcr_request_title" placeholder="Alex contingency request" /></div>
+        <div class="form-group"><label>Client Name</label><input type="text" id="pcr_client_name" placeholder="Property owner or customer name" /></div>
+        <div class="form-group"><label>Client Email</label><input type="email" id="pcr_client_email" placeholder="primary@example.com" /></div>
+        <div class="form-group"><label>CC Emails</label><input type="text" id="pcr_cc_emails" placeholder="ops@example.com, manager@example.com" /></div>
+      </div>
+      <div class="form-group full"><label>Email Subject</label><input type="text" id="pcr_email_subject" placeholder="Please sign your contract" /></div>
+      <div class="form-group full"><label>Email Message</label><textarea id="pcr_email_message" rows="5" placeholder="Hello {{signer_name}}, please review and sign your contract using the secure link below."></textarea></div>
+      <div class="form-group full"><label>Request Payload JSON</label><textarea id="pcr_request_payload" class="mono" rows="4" placeholder='{}'></textarea></div>
+
+      <div class="partner-contracts-request-head">
+        <h3><i class="fas fa-wand-magic-sparkles"></i> Prefill Values <small style="font-weight:400;color:var(--text-3);">Auto-fills these into the contract before sending</small></h3>
+      </div>
+      <div id="pcr_prefill_wrap" class="partner-contracts-prefill-wrap"></div>
+
+      <div class="partner-contracts-request-head">
+        <h3><i class="fas fa-users"></i> Signer Order</h3>
+        <button id="partnerContractsAddSignerBtn" class="btn-secondary" type="button"><i class="fas fa-user-plus"></i> Add Signer</button>
+      </div>
+      <div id="partnerContractsSignerList" class="partner-contracts-signer-builder"></div>
+      <div class="modal-actions">
+        <button id="partnerContractsRequestSaveBtn" class="btn-secondary" type="button"><i class="fas fa-save"></i> Save Draft</button>
+        <button id="partnerContractsRequestSendBtn" class="btn-save" type="button"><i class="fas fa-paper-plane"></i> Send Signature Requests</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== EDIT TEMPLATE MODAL ====== -->
+  <div id="partnerContractsEditTemplateModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2><i class="fas fa-pen-to-square"></i> Edit Template</h2>
+      <p class="modal-sub">Update the template's name, description, and category. Versions and field maps stay intact.</p>
+      <input type="hidden" id="pcet_template_id" />
+      <div class="form-grid">
+        <div class="form-group"><label>Template Name</label><input type="text" id="pcet_template_name" /></div>
+        <div class="form-group"><label>Category</label><input type="text" id="pcet_category" placeholder="Roofing, plumbing, mitigation…" /></div>
+      </div>
+      <div class="form-group full"><label>Description</label><textarea id="pcet_description" rows="3"></textarea></div>
+      <div class="modal-actions">
+        <button id="partnerContractsEditTemplateSaveBtn" class="btn-save" type="button"><i class="fas fa-save"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PARTNER CONTRACTS FIELD EDITOR ====== -->
+  <div id="partnerContractsFieldEditorModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-field-editor-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <div class="partner-contracts-field-editor-shell">
+        <div class="partner-contracts-field-editor-header">
+          <h2 id="fieldEditorTitle"><i class="fas fa-object-group"></i> Map Fields on Template</h2>
+          <p class="modal-sub" id="fieldEditorSub">Click a field type below, then click anywhere on the PDF to place it. Drag any placed field to reposition it.</p>
+        </div>
+        <div class="partner-contracts-field-editor-toolbar">
+          <div class="field-editor-toolbar-group">
+            <span class="toolbar-label">Add:</span>
+            <button type="button" class="btn-secondary field-add-btn" data-field-add="text"><i class="fas fa-font"></i> Text</button>
+            <button type="button" class="btn-secondary field-add-btn" data-field-add="date"><i class="fas fa-calendar"></i> Date</button>
+            <button type="button" class="btn-secondary field-add-btn" data-field-add="signature"><i class="fas fa-signature"></i> Sig</button>
+            <button type="button" class="btn-secondary field-add-btn" data-field-add="initials"><i class="fas fa-pen-fancy"></i> Init</button>
+            <button type="button" class="btn-secondary field-add-btn" data-field-add="checkbox"><i class="fas fa-square-check"></i> Box</button>
+          </div>
+          <div class="field-editor-toolbar-group field-editor-quickadd">
+            <span class="toolbar-label">Quick:</span>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Client Name" data-field-prefill="client_name" title="Drop a Client Name field (auto-fills from CRM)"><i class="fas fa-user"></i> Name</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Address" data-field-prefill="address_full" title="Drop a full Address field (auto-fills from CRM)"><i class="fas fa-location-dot"></i> Address</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Phone" data-field-prefill="client_phone" title="Drop a Phone field (auto-fills from CRM)"><i class="fas fa-phone"></i> Phone</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Email" data-field-prefill="client_email" title="Drop an Email field (auto-fills from CRM)"><i class="fas fa-envelope"></i> Email</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Insurance Carrier" data-field-prefill="insurance_carrier" title="Drop an Insurance Carrier field (auto-fills from CRM)"><i class="fas fa-shield-halved"></i> Carrier</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Policy #" data-field-prefill="policy_number" title="Drop a Policy Number field (auto-fills from CRM)"><i class="fas fa-hashtag"></i> Policy #</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Claim #" data-field-prefill="claim_number" title="Drop a Claim Number field (auto-fills from CRM)"><i class="fas fa-id-card"></i> Claim #</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="date" data-field-label="Date of Loss" data-field-prefill="date_of_loss" title="Drop a Date of Loss field (auto-fills from CRM)"><i class="fas fa-calendar-day"></i> DOL</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Type of Loss" data-field-prefill="type_of_loss" title="Drop a Type of Loss field (auto-fills from CRM damage type)"><i class="fas fa-droplet"></i> Loss Type</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Mortgage Co." data-field-prefill="mortgage_company" title="Drop a Mortgage Company field (auto-fills from CRM)"><i class="fas fa-building-columns"></i> Mortgage</button>
+            <button type="button" class="btn-secondary field-add-btn quickadd-btn" data-field-add="text" data-field-label="Loan #" data-field-prefill="mortgage_loan_number" title="Drop a Loan Number field (auto-fills from CRM)"><i class="fas fa-money-check-dollar"></i> Loan #</button>
+          </div>
+          <div class="field-editor-toolbar-group">
+            <span class="toolbar-label">Zoom:</span>
+            <button type="button" id="fieldEditorZoomOut" class="field-editor-zoom-btn" title="Zoom out"><i class="fas fa-magnifying-glass-minus"></i></button>
+            <span id="fieldEditorZoomDisplay" class="field-editor-zoom-display">100%</span>
+            <button type="button" id="fieldEditorZoomIn" class="field-editor-zoom-btn" title="Zoom in"><i class="fas fa-magnifying-glass-plus"></i></button>
+            <button type="button" id="fieldEditorZoomReset" class="field-editor-zoom-btn" title="Reset zoom">100%</button>
+            <button type="button" id="fieldEditorZoomFit" class="field-editor-zoom-btn" title="Large view">150%</button>
+          </div>
+          <div class="field-editor-toolbar-group">
+            <button type="button" id="fieldEditorSaveBtn" class="btn-save"><i class="fas fa-save"></i> Save Field Map</button>
+          </div>
+        </div>
+        <div id="fieldEditorStatus" class="agent-admin-status hidden"></div>
+        <div class="partner-contracts-field-editor-body">
+          <div class="partner-contracts-field-editor-canvas" id="fieldEditorPdfContainer">
+            <div class="empty-state"><i class="fas fa-file-pdf"></i><p>Loading template PDF…</p></div>
+          </div>
+          <aside class="partner-contracts-field-editor-side">
+            <h3>Field Settings</h3>
+            <p class="partner-contracts-helper-copy" id="fieldEditorSideHint">Select a placed field to edit its label, signer role, and CRM auto-fill source.</p>
+            <div id="fieldEditorFieldForm" class="hidden">
+              <div class="form-group"><label>Label</label><input type="text" id="fldLabel" /></div>
+              <div class="form-group"><label>Signer Role</label><select id="fldSignerRole"><option value="client">Client</option><option value="co_signer">Co-signer</option><option value="partner">Partner</option><option value="custom">Custom</option></select></div>
+              <div class="form-group"><label>CRM Auto-fill Source</label><select id="fldPrefillSource"><option value="">— None —</option></select></div>
+              <div class="form-group"><label class="check-row"><input type="checkbox" id="fldRequired" /> <span>Required</span></label></div>
+              <div class="form-group"><label>Width (% of page)</label><input type="number" id="fldWidth" min="3" max="100" step="0.5" /></div>
+              <div class="form-group"><label>Height (% of page)</label><input type="number" id="fldHeight" min="2" max="50" step="0.5" /></div>
+              <div class="form-actions">
+                <button type="button" id="fldApplyBtn" class="btn-save"><i class="fas fa-check"></i> Apply</button>
+                <button type="button" id="fldDeleteBtn" class="btn-danger"><i class="fas fa-trash"></i> Delete Field</button>
+              </div>
+            </div>
+            <hr style="opacity:0.3;margin:14px 0;" />
+            <h3>Placed Fields</h3>
+            <div id="fieldEditorList" class="partner-contracts-field-list"></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="partnerContractsDispatchModal" class="modal hidden">
+    <div class="modal-content modal-lg partner-contracts-modal partner-contracts-dispatch-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2><i class="fas fa-envelope-open-text"></i> Signature Email Launchpad</h2>
+      <p class="modal-sub">Use these ready-made email actions to open a draft for each active signer, copy secure signing links, or copy the full email body.</p>
+      <div id="partnerContractsDispatchSummary" class="partner-contracts-helper-copy"></div>
+      <div id="partnerContractsDispatchList" class="partner-contracts-dispatch-list"></div>
+    </div>
+  </div>
+
+  <!-- ====== SIGNED CLIENT MODAL ====== -->
+  <div id="signedClientModal" class="modal hidden">
+    <div class="modal-content modal-lg signed-clients-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="signedClientModalTitle"><i class="fas fa-file-signature"></i> Add Signed Client</h2>
+      <p class="modal-sub" id="signedClientModalSub">Create a signed client record and attach it to the correct partner admin.</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Client Name</label><input type="text" id="sc_client_name" /></div>
+        <div class="form-group"><label>Company Name</label><input type="text" id="sc_company_name" /></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="sc_phone" /></div>
+        <div class="form-group"><label>Email</label><input type="email" id="sc_email" /></div>
+        <div class="form-group"><label>Property Address</label><input type="text" id="sc_property_address" /></div>
+        <div class="form-group"><label>City</label><input type="text" id="sc_city" /></div>
+        <div class="form-group"><label>State</label><input type="text" id="sc_state" maxlength="2" /></div>
+        <div class="form-group"><label>ZIP</label><input type="text" id="sc_zip" /></div>
+        <div class="form-group"><label>Partner Owner</label><select id="sc_owner_admin_id"></select></div>
+        <div class="form-group"><label>Signed Date</label><input type="date" id="sc_signed_date" /></div>
+        <div class="form-group"><label>Service Type</label><input type="text" id="sc_service_type" placeholder="Roofing, mold, tarp, etc." /></div>
+        <div class="form-group"><label>Job Status</label><select id="sc_job_status"><option value="signed">Signed</option><option value="scheduled">Scheduled</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></div>
+        <div class="form-group"><label>Client Status</label><select id="sc_client_status"><option value="active">Active</option><option value="on_hold">On Hold</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></div>
+        <div class="form-group"><label>Contract Value</label><input type="number" id="sc_contract_value" min="0" step="0.01" value="0" /></div>
+        <div class="form-group"><label>Profit Amount</label><input type="number" id="sc_profit_amount" min="0" step="0.01" value="0" /></div>
+      </div>
+      <div class="form-group full"><label>Internal Notes</label><textarea id="sc_notes_private" rows="3"></textarea></div>
+      <div class="modal-actions">
+        <button id="signedClientSaveBtn" class="btn-save" type="button"><i class="fas fa-save"></i> Create Signed Client</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== DEAL ITEM MODAL ====== -->
+  <div id="dealItemModal" class="modal hidden">
+    <div class="modal-content modal-lg signed-clients-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="dealItemModalTitle"><i class="fas fa-list-check"></i> Add Deal Item</h2>
+      <p class="modal-sub" id="dealItemModalSub">Track a partner fee, payout, or client-linked receivable/payable.</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Partner</label><select id="di_partner_profile_id"></select></div>
+        <div class="form-group"><label>Client</label><select id="di_signed_client_id"></select></div>
+        <div class="form-group"><label>Scope</label><select id="di_item_scope"><option value="client">Client</option><option value="partner">Partner</option></select></div>
+        <div class="form-group"><label>Item Name</label><input type="text" id="di_item_name" /></div>
+        <div class="form-group"><label>Item Type</label><select id="di_item_type"><option value="commission_per_signed_client">Commission Per Signed Client</option><option value="training_fee">Training Fee</option><option value="membership_fee">Membership Fee</option><option value="upfront_fee">Upfront Fee</option><option value="profit_share">Profit Share</option><option value="tarp_placement">Tarp Placement</option><option value="mold_removal">Mold Removal</option><option value="bonus">Bonus</option><option value="reimbursement">Reimbursement</option><option value="adjustment">Adjustment</option><option value="custom">Custom</option></select></div>
+        <div class="form-group"><label>Direction</label><select id="di_direction"><option value="incoming">Incoming</option><option value="outgoing">Outgoing</option></select></div>
+        <div class="form-group"><label>Calculation Type</label><select id="di_calculation_type"><option value="fixed_amount">Fixed Amount</option><option value="per_signed_client">Per Signed Client</option><option value="percent_profit">Percent Profit</option><option value="percent_revenue">Percent Revenue</option><option value="manual">Manual</option></select></div>
+        <div class="form-group"><label>Rate / Flat Amount</label><input type="number" id="di_flat_amount" min="0" step="0.01" value="0" /></div>
+        <div class="form-group"><label>Percent Rate</label><input type="number" id="di_percent_rate" min="0" step="0.0001" value="0" /></div>
+        <div class="form-group"><label>Quantity</label><input type="number" id="di_quantity" min="0.01" step="0.01" value="1" /></div>
+        <div class="form-group"><label>Applies On</label><input type="date" id="di_applies_on" /></div>
+        <div class="form-group"><label>Status</label><select id="di_status"><option value="draft">Draft</option><option value="due">Due</option><option value="partial">Partial</option><option value="paid">Paid</option><option value="waived">Waived</option><option value="void">Void</option></select></div>
+      </div>
+      <div class="form-group full"><label>Notes</label><textarea id="di_notes" rows="3"></textarea></div>
+      <div class="modal-actions">
+        <button id="dealItemSaveBtn" class="btn-save" type="button"><i class="fas fa-save"></i> Save Deal Item</button>
+        <button id="dealItemDeleteBtn" class="btn-danger hidden" type="button"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TRANSACTION MODAL ====== -->
+  <div id="transactionModal" class="modal hidden">
+    <div class="modal-content modal-lg signed-clients-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="transactionModalTitle"><i class="fas fa-money-bill-transfer"></i> Log Transaction</h2>
+      <p class="modal-sub" id="transactionModalSub">Record money in or out and tie it to the correct partner and deal item.</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Partner</label><select id="tx_partner_profile_id"></select></div>
+        <div class="form-group"><label>Client</label><select id="tx_signed_client_id"></select></div>
+        <div class="form-group"><label>Applied Deal Item</label><select id="tx_deal_item_id"></select></div>
+        <div class="form-group"><label>Direction</label><select id="tx_direction"><option value="incoming">Incoming</option><option value="outgoing">Outgoing</option></select></div>
+        <div class="form-group"><label>Transaction Type</label><select id="tx_transaction_type"><option value="commission_payment">Commission Payment</option><option value="training_payment">Training Payment</option><option value="membership_fee">Membership Fee</option><option value="upfront_fee">Upfront Fee</option><option value="advance">Advance</option><option value="profit_share">Profit Share</option><option value="bonus">Bonus</option><option value="reimbursement">Reimbursement</option><option value="adjustment">Adjustment</option><option value="refund">Refund</option><option value="other">Other</option></select></div>
+        <div class="form-group"><label>Transaction Date</label><input type="date" id="tx_transaction_date" /></div>
+        <div class="form-group"><label>Amount</label><input type="number" id="tx_amount" min="0" step="0.01" value="0" /></div>
+        <div class="form-group"><label>Payment Method</label><select id="tx_payment_method"><option value="zelle">Zelle</option><option value="cash">Cash</option><option value="check">Check</option><option value="wire">Wire</option><option value="ach">ACH</option><option value="card">Card</option><option value="other">Other</option></select></div>
+        <div class="form-group"><label>Reference Number</label><input type="text" id="tx_reference_number" /></div>
+        <div class="form-group"><label>Status</label><select id="tx_status"><option value="pending">Pending</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="void">Void</option></select></div>
+      </div>
+      <div class="form-group full"><label>Notes</label><textarea id="tx_notes" rows="3"></textarea></div>
+      <div class="modal-actions">
+        <button id="transactionSaveBtn" class="btn-save" type="button"><i class="fas fa-save"></i> Save Transaction</button>
+        <button id="transactionDeleteBtn" class="btn-danger hidden" type="button"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ADD/EDIT LEAD MODAL ====== -->
+  <div id="leadModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="leadModalTitle">Lead Details</h2>
+      <div class="form-grid">
+        <div class="form-group"><label>Name</label><input type="text" id="lf_contact_name" /></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="lf_phone" /></div>
+        <div class="form-group"><label>Email</label><input type="email" id="lf_email" /></div>
+        <div class="form-group"><label>Address</label><input type="text" id="lf_address" /></div>
+        <div class="form-group"><label>City</label><input type="text" id="lf_city" /></div>
+        <div class="form-group"><label>State</label><input type="text" id="lf_state" /></div>
+        <div class="form-group"><label>Damage Type</label>
+          <select id="lf_damage_type">
+            <option value="">—</option>
+            <option>Water</option><option>Mold</option><option>Fire</option><option>Storm</option><option>Multi</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Source</label><input type="text" id="lf_source" placeholder="e.g. Cold Call List" /></div>
+        <div class="form-group"><label>Status</label>
+          <select id="lf_status">
+            <option>New</option><option>In Progress</option><option>Booked</option><option>Closed</option><option>Dead</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group full"><label>Notes</label><textarea id="lf_notes" rows="3"></textarea></div>
+
+      <div id="leadCallHistory" class="call-history-section hidden">
+        <h3><i class="fas fa-history"></i> Call History</h3>
+        <div id="leadCallHistoryList"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="logCallBtn" class="btn-secondary"><i class="fas fa-phone"></i> Log a Call</button>
+        <button id="leadSaveBtn" class="btn-save">Save Lead</button>
+        <button id="leadDeleteBtn" class="btn-danger hidden">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== LOG CALL MODAL ====== -->
+  <div id="callModal" class="modal hidden">
+    <div class="modal-content modal-sm">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="callModalTitle"><i class="fas fa-phone"></i> Log a Call</h2>
+      <p class="modal-sub" id="callForLead">For: —</p>
+
+      <div class="check-flow">
+        <label class="check-row">
+          <input type="checkbox" id="cf_answered" />
+          <span><strong>📞 Did they answer?</strong></span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="cf_presented" />
+          <span><strong>🎤 Did they let you present?</strong></span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="cf_booked" />
+          <span><strong>📅 Did you book an appointment?</strong></span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Outcome</label>
+        <select id="cf_outcome">
+          <option value="">—</option>
+          <option>Booked</option>
+          <option>Voicemail</option>
+          <option>Hung up</option>
+          <option>Not interested</option>
+          <option>Callback requested</option>
+          <option>Wrong number</option>
+          <option>No answer</option>
+        </select>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Duration (seconds)</label><input type="number" id="cf_duration" min="0" value="0" /></div>
+      </div>
+      <div class="form-group full"><label>Notes</label><textarea id="cf_notes" rows="3" placeholder="What happened on the call..."></textarea></div>
+
+      <div id="callMediaWrap" class="form-group full hidden">
+        <label>Call Recording &amp; Quo AI Interpretation</label>
+        <div id="callMediaBody" style="display:grid;gap:12px;padding:14px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.03);"></div>
+      </div>
+
+      <!-- Appointment fields, shown only if "Booked" is checked -->
+      <div id="apptInline" class="appt-inline hidden">
+        <h3>📅 Appointment Details</h3>
+        <div class="form-group"><label>Scheduled for</label><input type="datetime-local" id="cf_apptDate" /></div>
+        <div class="form-group full"><label>Appointment notes</label><textarea id="cf_apptNotes" rows="2"></textarea></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="callSaveBtn" class="btn-save">Save Call</button>
+        <button id="callDeleteBtn" class="btn-danger hidden">Delete</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ====== CSV IMPORT MODAL ====== -->
+  <div id="csvImportModal" class="modal hidden">
+    <div class="modal-content modal-lg">
+      <button class="modal-close" data-close>&times;</button>
+      <h2><i class="fas fa-file-csv"></i> Import Leads from CSV</h2>
+      <p class="modal-sub">Upload a CSV, map only the columns you care about, preview the results, and import clean lead records into the CRM.</p>
+
+      <div class="csv-upload-top">
+        <div class="form-group full">
+          <label>CSV files</label>
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" multiple />
+        </div>
+        <div class="csv-upload-actions">
+          <button id="csvAnalyzeBtn" class="btn-secondary" type="button"><i class="fas fa-wand-magic-sparkles"></i> Analyze CSV</button>
+        </div>
+      </div>
+
+      <div id="csvAnalyzeStatus" class="csv-status">Upload one or more CSV files and click <strong>Analyze CSV</strong>. The importer will combine them, let you map columns once, and then import everything together.</div>
+
+      <div id="csvImportConfig" class="hidden">
+        <div class="csv-summary-grid">
+          <div class="csv-summary-card">
+            <span class="csv-summary-label">Files selected</span>
+            <span class="csv-summary-value" id="csvFileCount">0</span>
+          </div>
+          <div class="csv-summary-card">
+            <span class="csv-summary-label">Rows found</span>
+            <span class="csv-summary-value" id="csvRowCount">0</span>
+          </div>
+          <div class="csv-summary-card">
+            <span class="csv-summary-label">Columns detected</span>
+            <span class="csv-summary-value" id="csvHeaderCount">0</span>
+          </div>
+          <div class="csv-summary-card">
+            <span class="csv-summary-label">Preview rows</span>
+            <span class="csv-summary-value">5</span>
+          </div>
+        </div>
+
+        <div class="csv-section-head">
+          <h3><i class="fas fa-diagram-project"></i> Map your CSV columns</h3>
+          <p>Pick only the information you want brought into the CRM. Any field left on <strong>Ignore this field</strong> will not be imported.</p>
+        </div>
+        <div id="csvMappingGrid" class="csv-mapping-grid"></div>
+
+        <div class="csv-section-head" style="margin-top:20px;">
+          <h3><i class="fas fa-sliders"></i> Import options</h3>
+          <p>Choose how duplicates should be handled and what defaults to use when the CSV leaves something blank.</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Duplicate handling</label>
+            <select id="csvDuplicateMode">
+              <option value="skip">Skip existing leads</option>
+              <option value="update">Update existing leads</option>
+              <option value="create">Import everything as new</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Match duplicates by</label>
+            <select id="csvDuplicateMatch">
+              <option value="phone_or_email">Phone or email</option>
+              <option value="phone">Phone only</option>
+              <option value="email">Email only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Default status</label>
+            <select id="csvDefaultStatus">
+              <option>New</option>
+              <option>In Progress</option>
+              <option>Booked</option>
+              <option>Closed</option>
+              <option>Dead</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Default source</label>
+            <input type="text" id="csvDefaultSource" placeholder="Imported CSV" value="Imported CSV" />
+          </div>
+        </div>
+
+        <div id="csvImportPreviewWrap" class="csv-preview-wrap hidden">
+          <div class="csv-section-head">
+            <h3><i class="fas fa-table"></i> Preview</h3>
+            <p>Here is how the first five rows will look after mapping.</p>
+          </div>
+          <div class="leads-table-wrap csv-preview-table">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Location</th>
+                  <th>Damage</th>
+                  <th>Source</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="csvPreviewBody">
+                <tr><td colspan="7" class="loading-row">Analyze a CSV to preview mapped rows.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="csvImportBtn" class="btn-save" type="button" disabled><i class="fas fa-file-import"></i> Import Leads</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== APPOINTMENT CREATE / EDIT MODAL ====== -->
+  <div id="apptModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" data-close>&times;</button>
+      <h2 id="apptModalTitle"><i class="fas fa-calendar-plus"></i> New Appointment</h2>
+      <p class="modal-sub" id="apptForLead">Fill in the details below.</p>
+
+      <div class="form-group">
+        <label>Lead</label>
+        <div class="lead-lookup" id="apptLeadLookup">
+          <input type="hidden" id="af_lead" />
+          <input type="text" id="af_lead_search" placeholder="Search by name, phone, city, ZIP, or address" autocomplete="off" />
+          <div id="af_lead_selected" class="lead-lookup-selected hidden"></div>
+          <div id="af_lead_results" class="lead-lookup-results hidden">
+            <div class="lead-lookup-empty">Start typing at least 2 characters to find a lead.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group"><label>Scheduled for</label><input type="datetime-local" id="af_scheduled" /></div>
+        <div class="form-group"><label>Duration (minutes)</label><input type="number" id="af_duration" min="15" step="15" value="60" /></div>
+        <div class="form-group"><label>Type</label>
+          <select id="af_type">
+            <option>Inspection</option>
+            <option>Strategy Call</option>
+            <option>Follow-up</option>
+            <option>Sign Contract</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select id="af_status">
+            <option>Scheduled</option><option>Completed</option><option>No-show</option>
+            <option>Cancelled</option><option>Signed</option><option>Lost</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group"><label>Booked by Agent</label><select id="af_agent"></select></div>
+        <div class="form-group"><label>Team</label><input type="text" id="af_team_preview" value="Unassigned" readonly /></div>
+      </div>
+
+      <div class="form-group full"><label>Location</label><input type="text" id="af_location" placeholder="Address, Phone, or Video" /></div>
+      <div class="form-group full"><label>Outcome / Notes</label><textarea id="af_outcome" rows="3"></textarea></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Signed Amount ($)</label><input type="number" id="af_amount" min="0" step="0.01" placeholder="0.00" /></div>
+        <div class="form-group"><label>Internal Notes</label><input type="text" id="af_notes" /></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="apptSaveBtn" class="btn-save"><i class="fas fa-save"></i> Save</button>
+        <button id="apptDocumikeBtn" class="btn-secondary hidden" type="button" title="Open DocuMike with this appointment's client info pre-filled"><i class="fas fa-file-signature"></i> DocuMike</button>
+        <button id="apptDeleteBtn" class="btn-danger hidden"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="dashboard.js"></script>
+  <script src="dialer.js"></script>
+  <script src="signed-clients.js"></script>
+  <script src="partner-contracts-setup.js"></script>
+  <script src="partner-contracts.js"></script>
+  <script src="partner-contracts-request-builder.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="partner-contracts-field-editor.js"></script>
+  <script src="documike-wizard.js"></script>
+    <!-- ============== POST-CALL LOG MODAL ============== -->
+    <div id="ccPostCallModal" class="cc-modal hidden" role="dialog" aria-modal="true" aria-labelledby="ccPcTitle">
+      <div class="cc-modal-backdrop"></div>
+      <div class="cc-modal-panel">
+        <header class="cc-modal-head">
+          <div>
+            <h2 id="ccPcTitle"><i class="fas fa-phone-volume"></i> Log This Call</h2>
+            <p>Pick a disposition before starting the next call. Quo is processing the recording in the background.</p>
+          </div>
+          <button type="button" class="cc-modal-close" id="ccPcCloseBtn" aria-label="Close">&times;</button>
+        </header>
+
+        <div class="cc-modal-body">
+          <div class="cc-pc-summary-row">
+            <div class="cc-pc-lead">
+              <strong id="ccPcLeadName">Lead Name</strong>
+              <p><span id="ccPcPhone">+1 555-000-0000</span> &middot; dialed from <span id="ccPcFromNumber">—</span></p>
+            </div>
+            <div class="cc-pc-meta">
+              <div class="cc-pc-elapsed" id="ccPcElapsed">0:00</div>
+              <div id="ccPcCallStatus"><span class="cc-pill cc-pill-info">Dialing…</span></div>
+            </div>
+          </div>
+
+          <div class="cc-pc-section">
+            <strong>AI Summary <small>(populates automatically after the call)</small></strong>
+            <p id="ccPcSummary" class="cc-pc-summary">Waiting for call to complete…</p>
+            <div id="ccPcRecordingWrap"></div>
+          </div>
+
+          <div class="cc-pc-section">
+            <strong>Disposition <small>(required)</small></strong>
+            <div class="cc-pc-dispo-row">
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="booked"><i class="fas fa-calendar-check"></i> Booked</button>
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="callback"><i class="fas fa-phone-rotary"></i> Callback</button>
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="not_interested"><i class="fas fa-ban"></i> Not Interested</button>
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="voicemail"><i class="fas fa-voicemail"></i> Voicemail</button>
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="no_answer"><i class="fas fa-phone-slash"></i> No Answer</button>
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="wrong_number"><i class="fas fa-circle-xmark"></i> Wrong Number</button>
+              <button type="button" class="cc-pc-dispo-btn" data-dispo="do_not_call"><i class="fas fa-shield-halved"></i> DNC Request</button>
+            </div>
+          </div>
+
+          <div class="cc-pc-section">
+            <strong>Call Log Metrics <small>(used in Call Log + Overview)</small></strong>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px;">
+              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;background:rgba(255,255,255,0.03);cursor:pointer;">
+                <input type="checkbox" id="ccPcAnswered" />
+                <span>Answered</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;background:rgba(255,255,255,0.03);cursor:pointer;">
+                <input type="checkbox" id="ccPcPresented" />
+                <span>Presented</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;background:rgba(255,255,255,0.03);cursor:pointer;">
+                <input type="checkbox" id="ccPcBooked" />
+                <span>Booked</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cc-pc-section">
+            <strong>Notes</strong>
+            <textarea id="ccPcDispoNotes" rows="3" placeholder="Add notes about the call — objections, follow-up time, damage details, anything that will help on the callback…"></textarea>
+          </div>
+        </div>
+
+        <footer class="cc-modal-foot">
+          <button type="button" class="btn-secondary" id="ccPcSaveBtn">
+            <i class="fas fa-save"></i> Save &amp; Close
+          </button>
+          <button type="button" class="btn-primary" id="ccPcSaveNextBtn">
+            <i class="fas fa-forward"></i> Save &amp; Call Next Lead
+          </button>
+        </footer>
+      </div>
+    </div>
+
+<script>window.__previewView="leads";</script><script src="preview-helper.js"></script></body>
+</html>
