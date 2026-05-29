@@ -1,0 +1,64 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+[[redirects]]
+  from = "/dashboard"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/dashboard/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/portal"
+  to = "/portal/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal/"
+  to = "/portal/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/training/roofing_callsheet"
+  to = "/dashboard/training/roofing_callsheet.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/training/plumbing_callsheet"
+  to = "/dashboard/training/plumbing_callsheet.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal/training/roofing_callsheet"
+  to = "/dashboard/training/roofing_callsheet.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal/training/plumbing_callsheet"
+  to = "/dashboard/training/plumbing_callsheet.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal/training/roofing_callsheet.html"
+  to = "/dashboard/training/roofing_callsheet.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal/training/plumbing_callsheet.html"
+  to = "/dashboard/training/plumbing_callsheet.html"
+  status = 200
+
+[[redirects]]
+  from = "/sign"
+  to = "/contract-signing/portal.html"
+  status = 200
+
+[[redirects]]
+  from = "/sign-in-person"
+  to = "/contract-signing/portal.html"
+  status = 200
